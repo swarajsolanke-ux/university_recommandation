@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Application</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .application-header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .application-header h1 {
+            color: #1a202c;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .application-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+        .status-draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-submitted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-under-review {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-final-offer {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            color: #1a202c;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background: #e6f2ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #667eea;
+        }
+
+        .upload-zone h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .upload-zone p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .document-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .doc-type-btn {
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .doc-type-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .doc-type-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f7fafc;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2563eb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification-success {
+            background: #10b981;
+        }
+
+        .notification-error {
+            background: #ef4444;
+        }
+
+        .notification-warning {
+            background: #f59e0b;
+        }
+
+        .notification-info {
+            background: #3b82f6;
+        }
+
+        .notification button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: auto;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state svg {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: -1;
+        }
+
+        .progress-step:last-child::before {
+            display: none;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #718096;
+        }
+
+        .progress-step.active .progress-circle {
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-step.completed .progress-circle {
+            background: #10b981;
+            color: white;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .document-requirements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .requirement-card {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .requirement-card h4 {
+            font-size: 14px;
+            color: #1a202c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .requirement-card p {
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .timeline {
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -20px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .timeline-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            font-size: 12px;
+        }
+
+        .timeline-item.active .timeline-icon {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .timeline-date {
+            font-size: 11px;
+            color: #a0aec0;
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Application Header -->
+        <div class="application-header" id="applicationDetails">
+            <h1>University Application</h1>
+            <p>Complete your application by uploading required documents</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="card">
+            <div class="progress-indicator">
+                <div class="progress-step completed">
+                    <div class="progress-circle">✓</div>
+                    <div class="progress-label">Created</div>
+                </div>
+                <div class="progress-step active">
+                    <div class="progress-circle">2</div>
+                    <div class="progress-label">Upload Documents</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-circle">3</div>
+                    <div class="progress-label">Review & Submit</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-circle">4</div>
+                    <div class="progress-label">Under Review</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Upload Section -->
+        <div class="card">
+            <h2>Upload Documents</h2>
+
+            <!-- Document Type Selector -->
+            <div class="document-type-selector">
+                <button class="doc-type-btn active" data-type="transcript">
+                    📄 Transcript
+                </button>
+                <button class="doc-type-btn" data-type="sop">
+                    ✍️ Statement of Purpose
+                </button>
+                <button class="doc-type-btn" data-type="lor">
+                    📝 Letter of Recommendation
+                </button>
+                <button class="doc-type-btn" data-type="resume">
+                    📋 Resume/CV
+                </button>
+                <button class="doc-type-btn" data-type="passport">
+                    🛂 Passport
+                </button>
+                <button class="doc-type-btn" data-type="other">
+                    📎 Other
+                </button>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📤</div>
+                <h3>Drag & Drop or Click to Upload</h3>
+                <p>PDF files only, max 10MB</p>
+                <input type="file" id="fileInput" style="display:none" accept="application/pdf">
+            </div>
+
+            <!-- Documents Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>Document Name</th>
+                        <th>Type</th>
+                        <th>Uploaded Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="docTableBody">
+                    <!-- Documents will be populated here -->
+                </tbody>
+            </table>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>No documents uploaded yet</h3>
+                <p>Upload your first document to get started</p>
+            </div>
+
+            <!-- Document Requirements -->
+            <div class="document-requirements">
+                <div class="requirement-card">
+                    <h4>📄 Transcript</h4>
+                    <p>Official academic records from your previous institution. Must be in English or with a certified
+                        translation.</p>
+                </div>
+                <div class="requirement-card">
+                    <h4>✍️ Statement of Purpose</h4>
+                    <p>A 500-1000 word essay explaining your motivation, background, and career goals.</p>
+                </div>
+                <div class="requirement-card">
+                    <h4>📝 Letter of Recommendation</h4>
+                    <p>At least two letters from professors or employers who can vouch for your potential.</p>
+                </div>
+                <div class="requirement-card">
+                    <h4>🛂 Passport Copy</h4>
+                    <p>A clear scan of your valid passport's bio-data page.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="card">
+                <h2>Application Timeline</h2>
+                <div class="timeline" id="applicationTimeline">
+                    <div class="timeline-item active">
+                        <div class="timeline-icon">✓</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Application Created</div>
+                            <div class="timeline-date" id="createdDate">-</div>
+                            <div class="timeline-desc">You started your application for this program.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <h2>Actions</h2>
+                <div class="action-buttons"
+                    style="flex-direction: column; align-items: stretch; border-top: none; margin-top: 0; padding-top: 0;">
+                    <button class="btn btn-primary" id="submitBtn" style="width: 100%;">
+                        Submit Application 
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/dashboard'"
+                        style="width: 100%; margin-top: 12px;">
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/application.js"></script>
+    <script>
+        let selectedDocType = 'transcript';
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Document type selection
+        document.querySelectorAll('.doc-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedDocType = btn.dataset.type;
+            });
+        });
+
+        // Upload zone click
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await handleFileUpload(file);
+            }
+        });
+
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                await handleFileUpload(file);
+            }
+        });
+
+        // Handle file upload
+        async function handleFileUpload(file) {
+            if (!file.name.endsWith('.pdf')) {
+                appManager.showNotification('Only PDF files are allowed', 'error');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                appManager.showNotification('File size must be less than 10MB', 'error');
+                return;
+            }
+
+            try {
+                await appManager.uploadDocument(file, selectedDocType);
+                fileInput.value = ''; // Reset input
+            } catch (error) {
+                console.error('Upload error:', error);
+            }
+        }
+
+        // Submit application
+        submitBtn.addEventListener('click', async () => {
+            await appManager.submitApplication();
+        });
+
+        // Check if we have documents to show empty state
+        function checkEmptyState() {
+            const tbody = document.getElementById('docTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (tbody.children.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+
+
+        // Initial check
+        checkEmptyState();
+
+        // Override updateDocumentTable to also check empty state
+        const originalUpdate = appManager.updateDocumentTable.bind(appManager);
+        appManager.updateDocumentTable = function () {
+            originalUpdate();
+            checkEmptyState();
+        };
+
+
+
+    </script>
+</body>
+
+</html>

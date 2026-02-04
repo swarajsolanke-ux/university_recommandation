@@ -1,0 +1,11 @@
+/.env
+/University.db
+/smart_env
+/__pycache__/
+/*.pyc
+/.vscode/
+/graph
+/.DS_Store
+/chroma_db_dir
+/backend/chroma_db
+/backend/__pycache__

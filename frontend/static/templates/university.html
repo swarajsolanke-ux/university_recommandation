@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Universities</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    form input, form select { padding: 8px; }
+    form button { grid-column: span 4; padding: 10px; background: #2563eb; color: #fff; border: none; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    .pagination { margin-top: 15px; }
+    .pagination button { padding: 6px 10px; margin-right: 5px; }
+  </style>
+</head>
+<body>
+
+<h2>Search Universities</h2>
+
+<form id="searchForm">
+  <input type="text" id="country" placeholder="Country" />
+  <input type="text" id="major" placeholder="Major" />
+  <input type="number" id="min_tuition" placeholder="Min Tuition" />
+  <input type="number" id="max_tuition" placeholder="Max Tuition" />
+  <input type="number" step="0.1" id="min_gpa" placeholder="Min GPA" />
+  <input type="number" step="0.1" id="max_gpa" placeholder="Max GPA" />
+  <input type="text" id="language" placeholder="Language" />
+  <select id="scholarship_track">
+    <option value="">Scholarship?</option>
+    <option value="true">Yes</option>
+    <option value="false">No</option>
+  </select>
+  <input type="text" id="search_query" placeholder="Search name/city" />
+  <button type="submit">Search</button>
+</form>
+
+<table id="resultsTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Country</th>
+      <th>City</th>
+      <th>Tuition Fee</th>
+      <th>Min GPA</th>
+      <th>Scholarship</th>
+      <th>Ranking</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div class="pagination" id="pagination"></div>
+
+<script>
+let currentPage = 1;
+
+async function fetchUniversities(page = 1) {
+  const params = new URLSearchParams();
+
+  const fields = [
+    'country','major','min_tuition','max_tuition','min_gpa','max_gpa','language','scholarship_track','search_query'
+  ];
+
+  fields.forEach(id => {
+    const val = document.getElementById(id).value;
+    if (val !== '') params.append(id, val);
+  });
+
+  params.append('page', page);
+  params.append('page_size', 10);
+  const token=localStorage.getItem("access_token");
+
+  const res = await fetch(`/universities/search?${params.toString()}`,{
+headers:{
+      "Authorization": `Bearer ${token}`
+}
+
+});
+  const data = await res.json();
+
+  renderTable(data.universities);
+  renderPagination(data.page, data.total_pages);
+}
+
+function renderTable(universities) {
+  const tbody = document.querySelector('#resultsTable tbody');
+  tbody.innerHTML = '';
+
+  universities.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${u.name}</td>
+      <td>${u.country}</td>
+      <td>${u.city}</td>
+      <td>${u.tuition_fee}</td>
+      <td>${u.min_gpa}</td>
+      <td>${u.scholarship_available ? 'Yes' : 'No'}</td>
+      <td>${u.ranking}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// function renderPagination(page, totalPages) {
+//   const container = document.getElementById('pagination');
+//   container.innerHTML = '';
+
+//   for (let i = 1; i <= totalPages; i++) {
+//     const btn = document.createElement('button');
+//     btn.textContent = i;
+//     if (i === page) btn.disabled = true;
+//     btn.onclick = () => {
+//       currentPage = i;
+//       fetchUniversities(i);
+//     };
+//     container.appendChild(btn);
+//   }
+// }
+
+document.getElementById('searchForm').addEventListener('submit', e => {
+  e.preventDefault();
+  currentPage = 1;
+  fetchUniversities(1);
+});
+
+// Initial load
+// fetchUniversities();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Recommender Assistant - UniMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/university-chatbot.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/dashboard" class="back-btn">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                </svg>
+                Back
+            </a>
+            <h1 class="header-title">
+                <span class="robot-icon">🤖</span>
+                University Recommender Assistant
+            </h1>
+            <button class="clear-btn" id="clearChatBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path
+                        d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
+                Clear Chat
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <aside class="filters-sidebar" id="filtersSidebar">
+            <div class="filters-header">
+                <h2>Filters</h2>
+                <button class="toggle-filters" id="toggleFiltersBtn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Track Selection</label>
+                <div class="track-selector">
+                    <button class="track-btn active" data-track="scholarship">
+                        🎓 Scholarship Track
+                    </button>
+                    <button class="track-btn" data-track="self-funded">
+                        💰 Self-Funded Track
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="countryFilter">Country</label>
+                <select id="countryFilter" class="filter-select">
+                    <option value="">All Countries</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="majorFilter">Major</label>
+                <select id="majorFilter" class="filter-select">
+                    <option value="">All Majors</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Budget (per year)</label>
+                <div class="range-container">
+                    <input type="range" id="budgetRange" class="filter-range" min="0" max="60000" step="1000"
+                        value="60000">
+                    <div class="range-value">
+                        <span>$</span><span id="budgetValue">60,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Minimum GPA</label>
+                <div class="range-container">
+                    <input type="range" id="gpaRange" class="filter-range" min="0" max="4.0" step="0.1"
+                        value="4.0">
+                    <div class="range-value">
+                        <span id="gpaValue">4.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="apply-filters-btn" id="applyFiltersBtn">
+                Apply Filters
+            </button>
+        </aside>
+
+        <!-- Chat Area -->
+        <main class="chat-container">
+            <!-- Messages Area -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- Welcome Message -->
+                <div class="message-wrapper assistant-message">
+                    <div class="message-bubble">
+                        <div class="message-content">
+                            <p>Hello! I'm your University Recommender Assistant.</p>
+                            <p>I can help you find the perfect university based on your preferences, budget, and academic profile. Just tell me what you're looking for!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" class="message-input"
+                        placeholder="Ask about universities, scholarships, programs...">
+                    <button id="sendBtn" class="send-btn">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="modal" id="comparisonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>University Comparison</h2>
+                <button class="modal-close" id="closeModalBtn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="comparisonContent">
+                <!-- Comparison table will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/university-chatbot.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - University Recommander</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header h1 {
+            color: #1a202c;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .application-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .application-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.15);
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .app-header h3 {
+            color: #1a202c;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-draft {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-submitted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-under-review {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-missing-documents {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-conditional-offer {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-final-offer {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .app-major {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .app-country {
+            color: #718096;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .app-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .app-date {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .app-docs {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #a0aec0;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back-btn">
+            ← Back to Dashboard
+        </a>
+
+        <div class="page-header">
+            <h1>My Applications</h1>
+            <p>Track and manage all your university applications</p>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-status="all">All Applications</button>
+            <button class="filter-btn" data-status="Draft">Draft</button>
+            <button class="filter-btn" data-status="Submitted">Submitted</button>
+            <button class="filter-btn" data-status="Under Review">Under Review</button>
+            <button class="filter-btn" data-status="Final Offer">Offers</button>
+        </div>
+
+        <div class="applications-grid" id="applicationsGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <h3>Loading applications...</h3>
+                <p>Please wait while we fetch your applications</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allApplications = [];
+        let currentFilter = 'all';
+
+        // Load applications on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApplications();
+            setupFilters();
+        });
+
+        async function loadApplications() {
+            try {
+                // Get user ID (in production, this should come from auth)
+                const userId = getUserId();
+
+                const response = await fetch(`/api/applications/user/${userId}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error('Failed to load applications');
+                }
+
+                allApplications = data.applications || [];
+                displayApplications(allApplications);
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                showError();
+            }
+        }
+
+        function displayApplications(applications) {
+            const grid = document.getElementById('applicationsGrid');
+
+            if (applications.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No applications found</h3>
+                        <p>Start your journey by applying to a university</p>
+                        <button class="btn-primary" onclick="window.location.href='/dashboard'">
+                            Apply to University
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = applications.map(app => `
+                <div class="application-card" onclick="window.location.href='/Apply_university?app_id=${app.id}'">
+                    <div class="app-header">
+                        <div>
+                            <h3>${app.university_name}</h3>
+                        </div>
+                        <span class="status-badge status-${app.status.toLowerCase().replace(/ /g, '-')}">
+                            ${app.status}
+                        </span>
+                    </div>
+                    <p class="app-major">${app.major_name}</p>
+                    <p class="app-country">📍 ${app.country}</p>
+                    <div class="app-footer">
+                        <span class="app-date">Applied: ${new Date(app.application_date).toLocaleDateString()}</span>
+                        <span class="app-docs">📎 ${app.document_count} documents</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Filter applications
+                    const status = btn.dataset.status;
+                    currentFilter = status;
+
+                    if (status === 'all') {
+                        displayApplications(allApplications);
+                    } else {
+                        const filtered = allApplications.filter(app => app.status === status);
+                        displayApplications(filtered);
+                    }
+                });
+            });
+        }
+
+        function getUserId() {
+            // Try to get user ID from localStorage
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    return user.id || user.user_id;
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            // Fallback to default user ID for testing
+            return 1;
+        }
+
+        function showError() {
+            const grid = document.getElementById('applicationsGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h3>Error loading applications</h3>
+                    <p>Please try again later</p>
+                    <button class="btn-primary" onclick="loadApplications()">
+                        Retry
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+
+</html>
