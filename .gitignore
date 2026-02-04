@@ -9,3 +9,4 @@
 /chroma_db_dir
 /backend/chroma_db
 /backend/__pycache__
+/storage
