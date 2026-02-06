@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Membership - UniMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <style>
+        .premium-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card.popular {
+            border-color: #3182ce;
+            transform: scale(1.05);
+            position: relative;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3182ce;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 24px 0;
+            color: #2d3748;
+        }
+
+        .price span {
+            font-size: 16px;
+            color: #718096;
+            font-weight: 400;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 32px 0;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .feature-item svg {
+            color: #48bb78;
+        }
+
+        /* Payment Modal */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-modal.active {
+            display: flex;
+        }
+
+        .payment-content {
+            background: white;
+            border-radius: 20px;
+            width: 450px;
+            padding: 32px;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .method-btn {
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .method-btn:hover {
+            border-color: #3182ce;
+        }
+
+        .method-btn.selected {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand"><span>UniMatch</span></div>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/premium" class="nav-link active">Pricing</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container premium-container">
+        <h1>Unlock Your Global Potential</h1>
+        <p style="font-size: 18px; color: #718096; max-width: 600px; margin: 16px auto;">
+            Choose the plan that's right for you and get advanced AI guidance, priority applications, and expert
+            support.
+        </p>
+
+        <div class="pricing-grid" id="pricingGrid">
+            <!-- Loaded via JS -->
+            <div class="loading">Loading plans...</div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-content">
+            <h3>Complete Your Upgrade</h3>
+            <p id="selectedPlanName" style="color: #718096; margin-bottom: 24px;"></p>
+
+            <label class="form-label">Select Payment Method</label>
+            <div class="payment-methods">
+                <div class="method-btn" onclick="selectMethod('KNET')">KNET</div>
+                <div class="method-btn" onclick="selectMethod('ApplePay')">Apple Pay</div>
+                <div class="method-btn" onclick="selectMethod('Card')">Credit Card</div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="processPayment()">Pay Now</button>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 12px;"
+                onclick="closePayment()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedFeatureId = null;
+        let selectedMethod = 'Card';
+
+        async function loadFeatures() {
+            const response = await fetch('/api/payments/features');
+            const data = await response.json();
+
+            const grid = document.getElementById('pricingGrid');
+            grid.innerHTML = data.features.map(f => `
+                <div class="pricing-card ${f.price > 10 ? 'popular' : ''}">
+                    ${f.price > 10 ? '<div class="popular-badge">BEST VALUE</div>' : ''}
+                    <h3 style="margin:0">${f.name}</h3>
+                    <div class="price">$${f.price}<span>/${f.duration} days</span></div>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            ${f.description}
+                        </li>
+                        <li class="feature-item">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Fast-track support
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="openPayment(${f.id}, '${f.name}')">Upgrade Now</button>
+                </div>
+            `).join('');
+        }
+
+        function openPayment(id, name) {
+            selectedFeatureId = id;
+            document.getElementById('selectedPlanName').textContent = name;
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePayment() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.textContent.includes(method === 'ApplePay' ? 'Apple Pay' : method));
+            });
+        }
+
+        async function processPayment() {
+            const formData = new FormData();
+            formData.append('feature_id', selectedFeatureId);
+            formData.append('method', selectedMethod);
+
+            const response = await fetch('/api/payments/checkout', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message);
+                window.location.href = '/dashboard';
+            } else {
+                alert('Payment failed. Please try again.');
+            }
+        }
+
+        loadFeatures();
+    </script>
+</body>
+
+</html>

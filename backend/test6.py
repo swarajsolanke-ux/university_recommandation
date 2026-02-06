@@ -2,6 +2,7 @@ from langchain_ollama import OllamaEmbeddings
 from typing import List, Dict
 import chromadb
 import sqlite3
+from fastapi import HTTPException
 
 class VectorStore:
     def __init__(
@@ -197,7 +198,7 @@ if __name__ == "__main__":
             print("No results found")
             
     except Exception as e:
-        raise
+        raise HTTPException(status_code=500, detail=str(e))
       
 
       

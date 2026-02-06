@@ -200,21 +200,25 @@ INSERT INTO university_majors (university_id, major_name) VALUES
 """)
     
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            university_id INTEGER,
-            major_id INTEGER,
-            status TEXT CHECK(status IN ('Draft', 'Submitted', 'Under Review', 'Missing Documents', 'Conditional Offer', 'Final Offer', 'Rejected')) DEFAULT 'Draft',
-            application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            notes TEXT,
-            admin_notes TEXT,
-            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-            FOREIGN KEY(university_id) REFERENCES universities(id),
-            FOREIGN KEY(major_id) REFERENCES majors(id)
+    CREATE TABLE IF NOT EXISTS applications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    university_id INTEGER,
+    major_id INTEGER,
+    status TEXT CHECK(status IN ('Draft', 'Submitted', 'Under Review', 
+        'Missing Documents', 'Conditional Offer', 'Final Offer', 'Rejected')) 
+        DEFAULT 'Draft',
+    application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    admin_notes TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(university_id) REFERENCES universities(id),
+    FOREIGN KEY(major_id) REFERENCES university_majors(id)
         )
     ''')
+    
+    
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS application_documents (
@@ -276,6 +280,19 @@ INSERT INTO university_majors (university_id, major_name) VALUES
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY(scholarship_id) REFERENCES scholarships(id)
+        )
+    ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS scholarship_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            scholarship_app_id INTEGER,
+            document_type TEXT,
+            file_path TEXT,
+            file_name TEXT,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_verified INTEGER DEFAULT 0,
+            FOREIGN KEY(scholarship_app_id) REFERENCES scholarship_applications(id) ON DELETE CASCADE
         )
     ''')
     
@@ -732,6 +749,19 @@ def seed_enhanced_data(conn):
         INSERT OR IGNORE INTO partners (name, category, description, logo_url, website, contact_email)
         VALUES (?, ?, ?, ?, ?, ?)
     ''', partners_data)
+    
+    # Seed Service Offers
+    offers_data = [
+        (1, 'Exclusive Student Car Lease', 'Get a brand new car starting from $199/month with zero down payment.', 15.0, 'Must be a full-time student, valid drivers license.', '/static/images/offers/car1.jpg', '2025-12-31'),
+        (2, 'Premium Student Account', 'No fees, $100 welcome bonus, and a high-limit student credit card.', 0, 'Proof of enrollment required.', '/static/images/offers/bank1.jpg', '2025-12-31'),
+        (3, 'Unlimited Student Data Plan', '5G unlimited data for just $15/month. Stay connected everywhere.', 40.0, 'University ID required.', '/static/images/offers/telecom1.jpg', '2025-12-31'),
+        (4, 'Global Student Flight Pass', 'Discounted flights to over 100 destinations worldwide.', 20.0, 'Valid for international students only.', '/static/images/offers/travel1.jpg', '2025-12-31')
+    ]
+    
+    cursor.executemany('''
+        INSERT OR IGNORE INTO service_offers (partner_id, title, description, discount_percentage, terms, image_url, valid_until)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', offers_data)
     
     conn.commit()
     print("Enhanced sample data seeded successfully")

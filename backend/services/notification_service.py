@@ -72,7 +72,7 @@ def notify_scholarship_status_change(
     status_messages = {
         "Submitted": f"Your scholarship application for {scholarship_name} has been submitted!",
         "Under Review": f"Your {scholarship_name} application is now under review.",
-        "Approved": f"🎉 Congratulations! You have been approved for the {scholarship_name}!",
+        "Approved": f"Congratulations! You have been approved for the {scholarship_name}!",
         "Rejected": f"Unfortunately, your {scholarship_name} application was not successful."
     }
     
@@ -82,6 +82,8 @@ def notify_scholarship_status_change(
         "Approved": "success",
         "Rejected": "error"
     }
+    
+
     
     message = status_messages.get(status, f"Your scholarship status has changed to: {status}")
     notification_type = notification_types.get(status, "info")

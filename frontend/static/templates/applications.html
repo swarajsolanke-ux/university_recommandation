@@ -362,12 +362,14 @@
 
                     // Filter applications
                     const status = btn.dataset.status;
+                    console.log("Filtering Application by status:",status);
                     currentFilter = status;
 
                     if (status === 'all') {
                         displayApplications(allApplications);
                     } else {
                         const filtered = allApplications.filter(app => app.status === status);
+                        console.log("Filtered Applications:", filtered);
                         displayApplications(filtered);
                     }
                 });

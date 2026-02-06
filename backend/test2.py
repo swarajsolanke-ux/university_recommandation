@@ -10,13 +10,12 @@ from pydantic import BaseModel, Field
 from typing import List, Optional,Dict
 from langchain_core.prompts import ChatPromptTemplate
 import sqlite3, json
-from test3 import SUBMAJOR_PROFILES, get_submajors_for_category, load_submajor_profile
 import re  
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import sqlite3
 import uuid
-
+from dotenv import load_dotenv
 load_dotenv(find_dotenv(filename="/Users/swarajsolanke/Smart_assistant_chatbot/university_recommander/.env"))
 
 
@@ -80,6 +79,7 @@ Main_CATEGORIES_LIST="""
 
 llm=ChatGroq(
     model="llama-3.1-8b-instant",
+    api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.0)
 
 

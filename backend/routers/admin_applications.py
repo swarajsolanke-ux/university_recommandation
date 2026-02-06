@@ -4,7 +4,7 @@ from services.application_service import ApplicationService
 from middleware.auth_middleware import require_admin
 from sqlite import get_db
 import sqlite3
-
+from logger import logger
 router = APIRouter(prefix="/api/admin/applications", tags=["Admin Applications"])
 
 @router.get("/")
@@ -29,7 +29,7 @@ def get_all_applications(
                 sp.full_name as student_name
             FROM applications a
             JOIN universities u ON a.university_id = u.id
-            JOIN majors m ON a.major_id = m.id
+            JOIN university_majors m ON a.major_id = m.id
             JOIN student_profiles sp ON a.user_id = sp.user_id
         """
         
@@ -78,7 +78,7 @@ def get_all_applications(
                 "student_name": row[8],
                 "document_count": doc_count
             })
-            
+        logger.info(f"Fetched {len(applications)} applications for admin")
         return {
             "applications": applications,
             "total_count": total_count,

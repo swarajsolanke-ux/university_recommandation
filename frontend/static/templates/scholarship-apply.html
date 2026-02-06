@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarship Application - UniMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/apply.css">
+    <style>
+        .eligibility-card {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .eligibility-score {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #48bb78;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .requirement-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .status-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .status-timeline::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        .timeline-step {
+            position: relative;
+            z-index: 2;
+            background: white;
+            padding: 0 10px;
+            text-align: center;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin: 0 auto 8px;
+            border: 4px solid white;
+        }
+
+        .step-dot.active {
+            background: #3182ce;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand"><span>UniMatch</span></div>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/scholarships" class="nav-link active">Scholarships</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px; margin-top: 40px;">
+        <div id="applicationContent">
+            <!-- Loading State -->
+            <div class="loading">Loading application details...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentApp = null;
+
+        async function initPage() {
+            try {
+                const response = await fetch('/api/scholarships/my-applications', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await response.json();
+
+                // For demo/simplicity, we take the most recent application
+                if (data.applications && data.applications.length > 0) {
+                    currentApp = data.applications[0];
+                    renderApplication(currentApp);
+                } else {
+                    document.getElementById('applicationContent').innerHTML = '<p>No active applications found.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function renderApplication(app) {
+            const content = document.getElementById('applicationContent');
+            content.innerHTML = `
+                <div class="page-header">
+                    <h1>Scholarship Application</h1>
+                    <p style="font-size: 18px; color: #4a5568;">${app.scholarship_name}</p>
+                </div>
+
+                <div class="status-timeline">
+                    <div class="timeline-step">
+                        <div class="step-dot ${['Draft', 'Submitted', 'Under Review', 'Approved'].includes(app.status) ? 'active' : ''}"></div>
+                        <div class="step-label">Draft</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-dot ${['Submitted', 'Under Review', 'Approved'].includes(app.status) ? 'active' : ''}"></div>
+                        <div class="step-label">Submitted</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-dot ${['Under Review', 'Approved'].includes(app.status) ? 'active' : ''}"></div>
+                        <div class="step-label">Under Review</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-dot ${app.status === 'Approved' ? 'active' : ''}"></div>
+                        <div class="step-label">Result</div>
+                    </div>
+                </div>
+
+                <div class="eligibility-card">
+                    <div class="eligibility-score">${app.eligibility_score}%</div>
+                    <div>
+                        <h3 style="margin: 0; color: #2d3748;">AI Eligibility Match</h3>
+                        <p style="margin: 8px 0 0; color: #4a5568; font-size: 14px;">
+                            Based on your profile, you have a high probability of success for this scholarship.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 32px;">
+                    <h2>Required Documents</h2>
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="fileInput" hidden>
+                        <div style="font-size: 40px; margin-bottom: 16px;">📄</div>
+                        <p>Drag & drop or <u>browse</u> to upload</p>
+                        <select id="docType" class="filter-select" style="margin-top: 16px;">
+                            <option value="transcript">Academic Transcript</option>
+                            <option value="lor">Recommendation Letter</option>
+                            <option value="essay">Motivation Essay</option>
+                        </select>
+                    </div>
+                    <div id="uploadStatus" style="margin-top: 16px; font-size: 14px; text-align: center;"></div>
+                </div>
+
+                <div style="text-align: right;">
+                    <button class="btn btn-primary" onclick="submitApplication()" ${app.status !== 'Draft' ? 'disabled' : ''}>
+                        Submit Application
+                    </button>
+                </div>
+            `;
+
+            setupUpload();
+        }
+
+        function setupUpload() {
+            const zone = document.getElementById('uploadZone');
+            const input = document.getElementById('fileInput');
+
+            zone.onclick = () => input.click();
+            input.onchange = async () => {
+                if (input.files.length === 0) return;
+
+                const file = input.files[0];
+                const docType = document.getElementById('docType').value;
+                const status = document.getElementById('uploadStatus');
+
+                status.innerHTML = `Uploading ${file.name}...`;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('document_type', docType);
+
+                try {
+                    const response = await fetch(`/api/scholarships/${currentApp.id}/upload`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        status.innerHTML = `<span style="color: #48bb78;">✅ ${file.name} uploaded successfully!</span>`;
+                    } else {
+                        status.innerHTML = `<span style="color: #e53e3e;">❌ Failed to upload document.</span>`;
+                    }
+                } catch (error) {
+                    status.innerHTML = `<span style="color: #e53e3e;">❌ Error uploading document.</span>`;
+                }
+            };
+        }
+
+        async function submitApplication() {
+            // Simplified status update for demo
+            alert('Your application has been submitted and is now under review!');
+            window.location.href = '/dashboard';
+        }
+
+        initPage();
+    </script>
+</body>
+
+</html>

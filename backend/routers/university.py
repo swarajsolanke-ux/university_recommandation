@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api/universities", tags=["Universities"])
 
 @router.get("/list")
 def list_universities(db: sqlite3.Connection = Depends(get_db)):
-    """Get all active universities for application modal"""
+
     cursor = db.cursor()
     
     cursor.execute("""
@@ -29,17 +29,21 @@ def list_universities(db: sqlite3.Connection = Depends(get_db)):
     """)
     
     universities = []
+    seen_ids=set()
     for row in cursor.fetchall():
-        universities.append({
-            "id": row[0],
-            "name": row[1],
-            "country": row[2],
-            "city": row[3],
-            "tuition_fee": row[4],
-            "min_gpa": row[5],
-            "scholarship_available": bool(row[6]),
-            "ranking": row[7]
-        })
+        if row[0] not in seen_ids:
+            seen_ids.add(row[0])
+            print(f"unique rows only:{seen_ids}")
+            universities.append({
+                "id": row[0],
+                "name": row[1],
+                "country": row[2],
+                "city": row[3],
+                "tuition_fee": row[4],
+                "min_gpa": row[5],
+                "scholarship_available": bool(row[6]),
+                "ranking": row[7]
+            })
     logger.info("Fetched active universities", len(universities))
     return {"universities": universities}
 
@@ -58,21 +62,39 @@ def get_university_majors(
     
     # Get majors from university_majors table
     cursor.execute("""
-        SELECT DISTINCT major_name
+        SELECT id, major_name
         FROM university_majors
         WHERE university_id = ?
         ORDER BY major_name ASC
     """, (university_id,))
+
+
     
     majors = []
-    for idx, row in enumerate(cursor.fetchall(), start=1):
-        majors.append({
-            "id": idx,
-            "major_id": idx,
-            "name": row[0],
-            "major_name": row[0]
-        })
-    logger.info("university major for university",len(majors),majors)
+    seen = set()   # track unique majors
+
+    for row in cursor.fetchall():
+        major_id = row[0]
+        major_name = row[1]
+
+        if major_name not in seen:   # ensure uniqueness
+            seen.add(major_name)
+            majors.append({
+                "id": row[0],
+                "major_id": row[0],
+                "major_name": major_name,
+                "name": major_name
+            })
+    # majors = []
+    # for row in cursor.fetchall():
+    #     majors.append({
+    #         "id": row[0],
+    #         "major_id": row[0],
+    #         "name": row[1],
+    #         "major_name": row[1]
+    #     })
+    print(f"reterived major from university id :{majors}")
+    # logger.info("university major for university",len(majors),majors)
     return {"majors": majors}
 
 @router.get("/search", response_model=UniversitySearchResponse)
@@ -209,7 +231,7 @@ def get_university_detail(
         (university_id,)
     )
     media = [{"id": r[0], "media_type": r[1], "media_url": r[2], "caption": r[3]} for r in cursor.fetchall()]
-    
+    print(f"media :{media}")
     # Get majors
     cursor.execute(
         """SELECT m.id, m.name, m.category, m.difficulty, m.career_paths, m.average_cost

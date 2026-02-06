@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Services Marketplace - UniMatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <style>
+        .services-hero {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .category-btn {
+            padding: 12px 24px;
+            border-radius: 99px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .category-btn.active {
+            background: #3182ce;
+            color: white;
+            border-color: #3182ce;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .offer-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .offer-image {
+            height: 200px;
+            background: #edf2f7;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .offer-body {
+            padding: 24px;
+        }
+
+        .offer-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            background: #e6fffa;
+            color: #2c7a7b;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .offer-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .partner-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* Lead Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            width: 500px;
+            max-width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand"><span>UniMatch</span></div>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/services" class="nav-link active">Marketplace</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="services-hero">
+            <h1>Student Essentials Marketplace</h1>
+            <p>Exclusive deals on banking, travel, tech, and more for international students.</p>
+        </div>
+
+        <div class="category-tabs">
+            <button class="category-btn active" onclick="loadOffers()">All Services</button>
+            <button class="category-btn" onclick="loadOffers('bank')">Banking</button>
+            <button class="category-btn" onclick="loadOffers('travel')">Travel</button>
+            <button class="category-btn" onclick="loadOffers('car')">Car Rental</button>
+            <button class="category-btn" onclick="loadOffers('telecom')">Telecom</button>
+        </div>
+
+        <div class="offers-grid" id="offersGrid">
+            <!-- Loading -->
+        </div>
+    </div>
+
+    <!-- Lead Form Modal -->
+    <div class="modal" id="leadModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Interested in this offer?</h2>
+            <p id="modalDesc" style="margin-bottom: 24px; color: #718096;">Let us share your details with our partner to
+                get you started.</p>
+            <form id="leadForm">
+                <input type="hidden" id="offerId" name="offer_id">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" name="student_name" required id="leadName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" name="student_email" required id="leadEmail">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" name="student_phone" required id="leadPhone">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()"
+                        style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Share My Interest</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        async function loadOffers(category = '') {
+            let url = '/api/services/offers';
+            if (category) url += `?category=${category}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            const grid = document.getElementById('offersGrid');
+            grid.innerHTML = data.offers.map(o => `
+                <div class="offer-card">
+                    <div class="offer-image" style="background-image: url('${o.image || 'https://via.placeholder.com/300x200'}')"></div>
+                    <div class="offer-body">
+                        <span class="offer-badge">${o.category}</span>
+                        <div class="offer-title">${o.title}</div>
+                        <p style="font-size: 14px; color: #718096; margin-bottom: 16px;">${o.description}</p>
+                        <div class="partner-info">
+                            <span>By ${o.partner_name}</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="openLeadModal(${o.id}, '${o.title}')" style="width: 100%; margin-top: 20px;">
+                            I'm Interested
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update active tab
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(category) || (category === '' && btn.textContent === 'All Services'));
+            });
+        }
+
+        function openLeadModal(id, title) {
+            document.getElementById('offerId').value = id;
+            document.getElementById('modalTitle').textContent = `Interested in ${title}?`;
+            document.getElementById('leadModal').classList.add('active');
+
+            // Auto-fill from local storage if available
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('leadName').value = user.full_name || '';
+            document.getElementById('leadEmail').value = user.email || '';
+        }
+
+        function closeModal() {
+            document.getElementById('leadModal').classList.remove('active');
+        }
+
+        document.getElementById('leadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            const response = await fetch('/api/services/lead', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Success! Our partner will contact you soon.');
+                closeModal();
+            } else {
+                alert('Something went wrong. Please try again.');
+            }
+        };
+
+        loadOffers();
+    </script>
+</body>
+
+</html>

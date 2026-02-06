@@ -25,6 +25,7 @@ class ApplicationService:
             """, (user_id, university_id, major_id))
             
             existing = cursor.fetchone()
+            print(f"existing application check:{existing}")
             if existing:
                 app_id, status = existing
                 if status != 'Draft':
@@ -46,7 +47,7 @@ class ApplicationService:
             conn.close()
             
             logger.info(f"Application {app_id} created for user {user_id}")
-            
+            print(f"application create with the id:{app_id}")
             return {
                 "application_id": app_id,
                 "status": "Draft",
@@ -59,15 +60,6 @@ class ApplicationService:
     
     @staticmethod
     def get_application_details(application_id: int) -> Optional[Dict]:
-        """
-        Get complete application details including documents
-        
-        Args:
-            application_id: ID of the application
-            
-        Returns:
-            Dict with application details or None
-        """
         try:
             conn = get_db()
             cursor = conn.cursor()
@@ -78,14 +70,15 @@ class ApplicationService:
                     a.id, a.user_id, a.university_id, a.major_id, a.status,
                     a.application_date, a.last_updated, a.notes, a.admin_notes,
                     u.name as university_name, u.country, u.city,
-                    m.name as major_name
+                    m.major_name as major_name
                 FROM applications a
                 JOIN universities u ON a.university_id = u.id
-                JOIN majors m ON a.major_id = m.id
+                JOIN university_majors m ON a.major_id = m.id
                 WHERE a.id = ?
             """, (application_id,))
             
             app = cursor.fetchone()
+            print(f"Application details fetched: {app}")
             if not app:
                 conn.close()
                 return None
@@ -100,7 +93,7 @@ class ApplicationService:
             
             documents = cursor.fetchall()
             conn.close()
-            
+            print(f"documents detailes fetched:{documents}")
             return {
                 "id": app[0],
                 "user_id": app[1],
@@ -134,16 +127,6 @@ class ApplicationService:
     
     @staticmethod
     def get_user_applications(user_id: int, status_filter: Optional[str] = None) -> List[Dict]:
-        """
-        Get all applications for a user
-        
-        Args:
-            user_id: ID of the user
-            status_filter: Optional status to filter by
-            
-        Returns:
-            List of application summaries
-        """
         try:
             conn = get_db()
             cursor = conn.cursor()
@@ -152,10 +135,10 @@ class ApplicationService:
                 SELECT 
                     a.id, a.status, a.application_date, a.last_updated,
                     u.name as university_name, u.country,
-                    m.name as major_name
+                    m.major_name as major_name
                 FROM applications a
                 JOIN universities u ON a.university_id = u.id
-                JOIN majors m ON a.major_id = m.id
+                JOIN university_majors m ON a.major_id = m.id
                 WHERE a.user_id = ?
             """
             
@@ -165,11 +148,12 @@ class ApplicationService:
                 query += " AND a.status = ?"
                 params.append(status_filter)
             
+            print(f"Executing query: {query}, params: {params}")
             query += " ORDER BY a.last_updated DESC"
             
             cursor.execute(query, params)
             applications = cursor.fetchall()
-            
+            print(f"fetched application:{applications}")
             # Get document count for each application
             result = []
             for app in applications:
@@ -190,7 +174,9 @@ class ApplicationService:
                     "document_count": doc_count
                 })
             
+        
             conn.close()
+            print(f"Returning user applications: {len(result)} applications and their details:{result}")
             return result
             
         except Exception as e:

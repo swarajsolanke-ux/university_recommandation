@@ -31,6 +31,12 @@ async function loadUserData() {
 
             // Store user data
             window.currentUser = data;
+
+            // Show admin link if user is admin
+            if (data.user?.is_admin) {
+                const adminLink = document.getElementById('adminPortalLink');
+                if (adminLink) adminLink.style.display = 'flex';
+            }
         }
     } catch (error) {
         console.error('Error loading user data:', error);

@@ -71,6 +71,8 @@ class ApplicationManager {
             const response = await fetch(`/api/applications/${this.currentApplicationId}`);
             const data = await response.json();
 
+            console.log("loaded the application",data)
+
             if (!response.ok) {
                 console.error('Failed to load application:', data);
                 throw new Error(data.detail || 'Failed to load application details');

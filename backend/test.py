@@ -12,6 +12,7 @@ from langchain_core.prompts import ChatPromptTemplate
 import sqlite3, json
 import logging
 
+
 #finding and loading .env file
 load_dotenv(find_dotenv(filename="/Users/swarajsolanke/Smart_assistant_chatbot/university_recommander/.env"))
 
@@ -159,6 +160,7 @@ CAREER_TENDENCIES:
 
 llm=ChatGroq(
     model="llama-3.1-8b-instant",
+    api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.0
 )
 
