@@ -5,7 +5,7 @@ from typing import List, Dict, Optional, Tuple
 import logging
 
 from services.notification_service import NotificationService
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -185,15 +185,6 @@ class ApplicationService:
     
     @staticmethod
     def submit_application(application_id: int) -> Dict:
-        """
-        Submit an application (change status from Draft to Submitted)
-        
-        Args:
-            application_id: ID of the application
-            
-        Returns:
-            Dict with success status and message
-        """
         try:
             conn = get_db()
             cursor = conn.cursor()
@@ -248,22 +239,44 @@ class ApplicationService:
                 notification_type="success",
                 link=f"/applications/{application_id}"
             )
+
+            cursor.execute("""
+            SELECT id, document_type, uploaded_at
+            FROM application_documents
+            WHERE application_id = ?
+        """, (application_id,))
+
+            docs = cursor.fetchall()
+            logger.info(f"Fetched {len(docs)} documents for application {application_id} after submission,docs detailes:{docs[0]}")
+
+            response = {
+                "message": "Application submitted successfully",
+                "documents": [
+                    {
+                        "id": d[0],
+                        "name": d[1],  
+                        "uploaded_at": d[2]
+                    }
+                    for d in docs
+                ]
+            }
             
             conn.commit()
             conn.close()
             
             logger.info(f"Application {application_id} submitted successfully")
+            return response
             
-            return {
-                "success": True,
-                "status": "Submitted",
-                "message": "Application submitted successfully",
-                "next_steps": [
-                    "Your application is now under review",
-                    "You will receive notifications about status updates",
-                    "Estimated review time: 5-7 business days"
-                ]
-            }
+            # return {
+            #     "success": True,
+            #     "status": "Submitted",
+            #     "message": "Application submitted successfully",
+            #     "next_steps": [
+            #         "Your application is now under review",
+            #         "You will receive notifications about status updates",
+            #         "Estimated review time: 5-7 business days"
+            #     ]
+            # }
             
         except Exception as e:
             logger.error(f"Error submitting application: {e}")

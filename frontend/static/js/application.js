@@ -210,6 +210,7 @@ class ApplicationManager {
         }
         console.log("application id is feth sucessfully:", this.currentApplicationId)
         const formData = new FormData();
+        console.log("file is uploaded", file)
         formData.append('file', file);
         formData.append('document_type', documentType);
         console.log("file is uploaded ", file)
@@ -239,9 +240,7 @@ class ApplicationManager {
         }
     }
 
-    /**
-     * Update document table
-     */
+    
     updateDocumentTable() {
         const tableBody = document.getElementById('docTableBody');
         if (!tableBody) return;
@@ -256,7 +255,7 @@ class ApplicationManager {
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>
-                    <div style="font-weight: 500;">${doc.filename}</div>
+                    <div style="font-weight: 500;">${doc.file_name}</div>
                     <div style="font-size: 11px; color: #a0aec0;">${(new Date(doc.uploaded_at)).toLocaleString()}</div>
                 </td>
                 <td><span class="info-badge">${doc.document_type.toUpperCase()}</span></td>
@@ -274,6 +273,7 @@ class ApplicationManager {
             `;
             tableBody.appendChild(row);
         });
+
 
         // Update submit button visibility
         const submitBtn = document.getElementById('submitBtn');
@@ -315,9 +315,7 @@ class ApplicationManager {
             this.showNotification('Application submitted successfully!', 'success');
 
             // Reload to show updated status
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            await this.loadApplicationDetails(this.currentApplicationId);
 
             return data;
         } catch (error) {
@@ -332,7 +330,7 @@ class ApplicationManager {
      */
     previewDocument(filePath) {
         // Open document in new tab
-        window.open(`/static/uploads/${filePath.split('/').pop()}`, '_blank');
+        window.open(`/static/storage/${filePath.split('/').pop()}`, '_blank');
     }
 
     /**

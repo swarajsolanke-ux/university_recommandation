@@ -17,6 +17,7 @@
         <div class="nav-container">
             <div class="nav-brand">
                 <span class="logo-text">UniMatch</span>
+                <a href="/dashboard"> </a>
             </div>
             <div class="nav-links">
                 <a href="/dashboard" class="nav-link active">
@@ -25,14 +26,14 @@
                     </svg>
                     Dashboard
                 </a>
-                <a href="#" class="nav-link">
+                <a href="/university-chatbot" class="nav-link">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path
                             d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
                     </svg>
                     Universities
                 </a>
-                <a href="#" class="nav-link">
+                <a href="/applications" class="nav-link">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path
                             d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
@@ -46,13 +47,12 @@
                     </svg>
                     Scholarships
                 </a>
-                <a href="/admin/portal" id="adminPortalLink" class="nav-link"
-                    style="display: none; color: #3182ce; font-weight: 700;">
+                <a href="/admin/portal" class="nav-link" id="adminPortalLink"></a>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path
                             d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
                     </svg>
-                    Admin Portal
+                   Admin Pannel
                 </a>
             </div>
             <div class="nav-actions">
@@ -63,7 +63,7 @@
                     </svg>
                     <span class="badge" id="notificationBadge">0</span>
                 </button>
-                <div class="user-menu">
+                <div  class="user-menu">
                     <button class="user-btn" id="userBtn">
                         <div class="avatar">
                             <span id="userInitial">U</span>
@@ -133,16 +133,16 @@
 
         <!-- Main Content Grid -->
         <div class="dashboard-grid">
-            <!-- Recommended Universities -->
             <div class="card">
                 <div class="card-header">
-                    <h2>🎯 Recommended For You</h2>
+                    <h2>Recommended For You</h2>
                     <a href="/universities" class="link-btn">View All</a>
                 </div>
                 <div class="university-list" id="recommendedUniversities">
                     <div class="loading">Loading recommendations...</div>
                 </div>
             </div>
+            <br><br>
 
             <!-- Recent Activity -->
             <div class="card">
@@ -160,6 +160,7 @@
                 </div>
             </div>
 
+            <br><br>
             <!-- Quick Actions -->
             <div class="card">
                 <div class="card-header">
@@ -180,7 +181,7 @@
                         </svg>
                         <span>Compare Universities</span>
                     </a>
-                    <a href="#" class="action-btn" id="applyUniversityBtn">
+                    <a href="/apply-university" class="action-btn" id="applyUniversityBtn">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                             <path
                                 d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z" />

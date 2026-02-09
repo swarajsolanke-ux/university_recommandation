@@ -15,7 +15,7 @@ class Settings:
     REFRESH_TOKEN_EXPIRE_DAYS = 30
     
     # File Upload
-    UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./backend/storage/uploads")
+    UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/frontend/static/storage/scholarship")
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
     ALLOWED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx'}
     

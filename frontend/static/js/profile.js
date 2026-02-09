@@ -129,8 +129,10 @@ async function savePersonalInfo() {
         full_name: document.getElementById('fullName').value,
         nationality: document.getElementById('nationality').value,
         date_of_birth: document.getElementById('dateOfBirth').value,
-        bio: document.getElementById('bio').value
+        bio: document.getElementById('bio').value,
+        
     };
+    console.log('data to sent to backend',data)
 
     try {
         const response = await authenticatedFetch('/auth/profile/create', {
@@ -153,6 +155,7 @@ async function savePersonalInfo() {
 
 async function saveAcademicProfile() {
     const data = {
+      
         gpa: parseFloat(document.getElementById('gpa').value) || null,
         budget: parseInt(document.getElementById('budget').value) || null,
         preferred_country: document.getElementById('preferredCountry').value,
@@ -162,7 +165,7 @@ async function saveAcademicProfile() {
     };
 
     try {
-        const response = await authenticatedFetch('/auth/profile/create', {
+        const response = await authenticatedFetch('/auth/profile/academic', {
             method: 'POST',
             body: JSON.stringify(data)
         });

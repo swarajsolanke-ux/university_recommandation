@@ -3,9 +3,9 @@ import sqlite3
 from sqlite import get_db
 from datetime import datetime
 import logging
-
+logging.basicConfig(level=logging.INFO,format={'%(asctime)s - %(name)s - %(levelname)s - %(message)s'})
 logger = logging.getLogger(__name__)
-
+logger.info("logger sucessfuly initializd in scholarship service")
 class ScholarshipService:
     @staticmethod
     def get_all_scholarships(country: Optional[str] = None, min_amount: Optional[int] = None) -> List[Dict]:
@@ -18,7 +18,7 @@ class ScholarshipService:
             params = []
             
             if country:
-                query += " AND (country = ? OR nationality_requirement = 'All nationalities')"
+                query += " AND (country = ?)"
                 params.append(country)
             
             if min_amount:
@@ -27,26 +27,30 @@ class ScholarshipService:
                 
             cursor.execute(query, params)
             rows = cursor.fetchall()
-            
+            logger.info(f'fetched data from scholarship tables with filters country')
             scholarships = []
+            seen=set()
             for row in rows:
-                scholarships.append({
-                    "id": row[0],
-                    "name": row[1],
-                    "country": row[2],
-                    "provider": row[3],
-                    "min_gpa": row[4],
-                    "max_age": row[5],
-                    "nationality_requirement": row[6],
-                    "coverage": row[7],
-                    "amount": row[8],
-                    "deadline": row[9],
-                    "description": row[10],
-                    "required_documents": row[11],
-                    "website": row[12]
-                })
+                if row[1] not in  seen:
+                    seen.add(row[1])
+                    scholarships.append({
+                        "id": row[0],
+                        "name": row[1],
+                        "country": row[2],
+                        "provider": row[3],
+                        "min_gpa": row[4],
+                        "max_age": row[5],
+                        "nationality_requirement": row[6],
+                        "coverage": row[7],
+                        "amount": row[8],
+                        "deadline": row[9],
+                        "description": row[10],
+                        "required_documents": row[11],
+                        "website": row[12]
+                    })
             
             conn.close()
+            logger.info(f"fetched {len(scholarships)} and all unique scholrship:{scholarships}")
             return scholarships
         except Exception as e:
             logger.error(f"Error fetching scholarships: {e}")
@@ -54,14 +58,13 @@ class ScholarshipService:
 
     @staticmethod
     def get_scholarship_by_id(scholarship_id: int) -> Optional[Dict]:
-        """Fetch details for a specific scholarship"""
         try:
             conn = get_db()
             cursor = conn.cursor()
             
             cursor.execute("SELECT * FROM scholarships WHERE id = ?", (scholarship_id,))
             row = cursor.fetchone()
-            
+            logger.info(f"fetched data:{row[0]}")
             if not row:
                 conn.close()
                 return None
@@ -90,14 +93,14 @@ class ScholarshipService:
 
     @staticmethod
     def calculate_eligibility(user_id: int, scholarship_id: int) -> Dict:
-        """Perform AI eligibility check based on student profile"""
         try:
             conn = get_db()
             cursor = conn.cursor()
-            
+            print("cursor created sucessfullly")
             # Get student profile
             cursor.execute("SELECT gpa, nationality FROM student_profiles WHERE user_id = ?", (user_id,))
             student = cursor.fetchone()
+            logger.info(f"fetched student profile data :{student}")
             if not student:
                 conn.close()
                 return {"eligible": False, "reason": "Student profile not found"}
@@ -116,10 +119,13 @@ class ScholarshipService:
             score = 100
             reasons = []
             
+
+            print("running sucessfully")
             # Check GPA
-            if student_gpa < min_gpa:
+            if (student_gpa) < (min_gpa):
                 score -= 40
                 reasons.append(f"GPA ({student_gpa}) is below required ({min_gpa})")
+                print(f"GPA check failed :{reasons}")
             
             # Check Nationality
             if nat_req != "All nationalities" and student_nationality.lower() not in nat_req.lower():

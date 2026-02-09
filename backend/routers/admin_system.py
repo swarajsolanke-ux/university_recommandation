@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/admin/system", tags=["Admin System"])
 @router.get("/stats")
 def get_dashboard_stats(db: sqlite3.Connection = Depends(require_admin)):
     """Fetch high-level system statistics for admin dashboard"""
-    user, conn = db 
+    user, conn = get_db()
     cursor = conn.cursor()
     
     stats = {}

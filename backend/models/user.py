@@ -94,6 +94,16 @@ class StudentProfileUpdate(BaseModel):
     career_goal: Optional[str] = None
     bio: Optional[str] = Field(None, max_length=500)
 
+
+
+class StudentAcademicUpdate(BaseModel):
+    gpa: Optional[float] = Field(None, ge=0.0, le=4.0)
+    budget: Optional[int] = Field(None, ge=0)
+    preferred_country: Optional[str] = None
+    preferred_major: Optional[str] = None
+    learning_style: Optional[str] = None
+    career_goal: Optional[str] = None
+
 class StudentProfile(BaseModel):
     id: int
     user_id: int

@@ -12,7 +12,7 @@ def submit_application(application_id:int):
     cursor.execute("""
 UPDATE applications
 SET status="Submitted",last_updated=CURRENT_TIMESTAMP WHERE id=? """,(application_id,))
-    
+    print("application submitted sucessfully")
     conn.commit()
     conn.close()
 

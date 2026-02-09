@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from models.user import (
     OTPRequest, OTPVerify, UserRegister, UserLogin,
-    TokenResponse, UserWithProfile, StudentProfileCreate
+    TokenResponse, UserWithProfile, StudentProfileCreate,StudentAcademicUpdate
 )
 from services import auth_service, otp_service, notification_service
 from sqlite import get_db
@@ -227,3 +227,30 @@ def create_profile(
 def logout(current_user: dict = Depends(get_current_active_user)):
     """Logout user (client should discard tokens)"""
     return {"message": "Logged out successfully"}
+
+@router.post("/profile/academic")
+def update_academic_profile(
+    profile: StudentAcademicUpdate,
+    current_user: dict = Depends(get_current_active_user),
+    db: sqlite3.Connection = Depends(get_db)
+):
+    user_id = current_user["user_id"]
+    cursor = db.cursor()
+
+    cursor.execute("""
+        UPDATE student_profiles 
+        SET gpa=?, budget=?, preferred_country=?, preferred_major=?, 
+            learning_style=?, career_goal=?
+        WHERE user_id=?
+    """, (
+        profile.gpa,
+        profile.budget,
+        profile.preferred_country,
+        profile.preferred_major,
+        profile.learning_style,
+        profile.career_goal,
+        user_id
+    ))
+
+    db.commit()
+    return {"message": "Academic profile updated"}

@@ -15,7 +15,6 @@ def list_scholarships(
     country: Optional[str] = Query(None),
     min_amount: Optional[int] = Query(None)
 ):
-    """List all available scholarships"""
     scholarships = ScholarshipService.get_all_scholarships(country, min_amount)
     return {"scholarships": scholarships}
 
@@ -58,7 +57,7 @@ async def upload_scholarship_doc(
     """Upload documents for a scholarship application"""
     try:
         # Create directory if it doesn't exist
-        upload_dir = os.path.join(settings.UPLOAD_DIR, "scholarships", str(application_id))
+        upload_dir = os.path.join(settings.UPLOAD_DIR, "scholarship", str(application_id))
         os.makedirs(upload_dir, exist_ok=True)
         
         file_path = os.path.join(upload_dir, file.filename)
@@ -69,13 +68,15 @@ async def upload_scholarship_doc(
         cursor.execute(
             """INSERT INTO scholarship_documents (scholarship_app_id, document_type, file_path, file_name)
             VALUES (?, ?, ?, ?)""",
-            (application_id, document_type, f"/static/uploads/scholarships/{application_id}/{file.filename}", file.filename)
+            (application_id, document_type, f"/static/storage/scholarship/{application_id}/{file.filename}", file.filename)
         )
         db.commit()
         
         return {"success": True, "file_name": file.filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 
 @router.get("/my-applications")
 def list_my_applications(

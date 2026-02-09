@@ -13,8 +13,8 @@ router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
 @router.get("/features")
 def get_premium_features(db: sqlite3.Connection = Depends(get_db)):
-    """List all available premium features"""
-    cursor = db.cursor()
+    conn=get_db()
+    cursor = conn.cursor()
     cursor.execute("SELECT id, feature_name, description, price, duration_days FROM premium_features WHERE is_active = 1")
     rows = cursor.fetchall()
     
