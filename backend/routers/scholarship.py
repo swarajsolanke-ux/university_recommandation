@@ -13,15 +13,16 @@ router = APIRouter(prefix="/api/scholarships", tags=["Scholarships"])
 @router.get("/")
 def list_scholarships(
     country: Optional[str] = Query(None),
-    min_amount: Optional[int] = Query(None)
+    min_amount: Optional[int] = Query(None),
+    db: sqlite3.Connection = Depends(get_db)
 ):
-    scholarships = ScholarshipService.get_all_scholarships(country, min_amount)
+    scholarships = ScholarshipService.get_all_scholarships(country, min_amount,db=db)
     return {"scholarships": scholarships}
 
 @router.get("/{scholarship_id}")
-def get_scholarship(scholarship_id: int):
+def get_scholarship(scholarship_id: int,db: sqlite3.Connection = Depends(get_db)):
     """Get detailed scholarship information"""
-    scholarship = ScholarshipService.get_scholarship_by_id(scholarship_id)
+    scholarship = ScholarshipService.get_scholarship_by_id(scholarship_id,db=db)
     if not scholarship:
         raise HTTPException(status_code=404, detail="Scholarship not found")
     return scholarship
@@ -29,19 +30,21 @@ def get_scholarship(scholarship_id: int):
 @router.get("/{scholarship_id}/eligibility")
 def check_eligibility(
     scholarship_id: int,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
+    db: sqlite3.Connection = Depends(get_db)
 ):
     """Check user's eligibility for a scholarship"""
-    result = ScholarshipService.calculate_eligibility(current_user["user_id"], scholarship_id)
+    result = ScholarshipService.calculate_eligibility(current_user["user_id"], scholarship_id,db=db)
     return result
 
 @router.post("/{scholarship_id}/apply")
 def apply_scholarship(
     scholarship_id: int,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
+    db: sqlite3.Connection = Depends(get_db)
 ):
     """Create a draft scholarship application"""
-    result = ScholarshipService.create_scholarship_application(current_user["user_id"], scholarship_id)
+    result = ScholarshipService.create_scholarship_application(current_user["user_id"], scholarship_id,db=db)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
     return result

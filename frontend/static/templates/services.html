@@ -257,7 +257,7 @@
 
             const response = await fetch('/api/services/lead', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
                 body: formData
             });
 

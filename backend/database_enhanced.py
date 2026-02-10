@@ -23,6 +23,12 @@ def create_enhanced_schema(db_name="University.db"):
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    cursor.execute('''
+    ALTER TABLE users
+    ADD COLUMN is_admin INTEGER DEFAULT 0
+''')
+
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS otp_verification (

@@ -77,7 +77,7 @@ def authenticate_user(db: sqlite3.Connection, email: str, password: str):
     return None
 
 def create_user(db: sqlite3.Connection, phone: Optional[str], email: Optional[str], 
-                password: Optional[str], auth_provider: str = "email"):
+                password: Optional[str], auth_provider: str = "email", is_admin: bool = False) -> Optional[int]:
     """Create a new user"""
     cursor = db.cursor()
     
@@ -86,16 +86,20 @@ def create_user(db: sqlite3.Connection, phone: Optional[str], email: Optional[st
     
     try:
         cursor.execute(
-            """INSERT INTO users (phone, email, password_hash, auth_provider, is_active, is_premium)
-               VALUES (?, ?, ?, ?, 1, 0)""",
-            (phone, email, password_hash, auth_provider)
+            """INSERT INTO users (phone, email, password_hash, auth_provider, is_active,is_premium,is_admin)
+               VALUES (?, ?, ?, ?, 1, 0, ?)""",
+            (phone, email, password_hash, auth_provider, 1 if is_admin else 0)
         )
         db.commit()
         user_id = cursor.lastrowid
+        cursor.close()
         return user_id
     except sqlite3.IntegrityError:
+        db.rollback()
+        cursor.close()
         # User already exists
         return None
+    
 
 def get_user_by_email(db: sqlite3.Connection, email: str):
     """Get user by email"""

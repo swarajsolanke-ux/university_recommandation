@@ -61,7 +61,6 @@ def verify_otp(request: OTPVerify, db: sqlite3.Connection = Depends(get_db)):
 
 @router.post("/register", response_model=TokenResponse)
 def register(request: UserRegister, db: sqlite3.Connection = Depends(get_db)):
-    """Register new user with email/password"""
     if request.auth_provider == "email" and (not request.email or not request.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -70,7 +69,7 @@ def register(request: UserRegister, db: sqlite3.Connection = Depends(get_db)):
     
     # Create user
     user_id = auth_service.create_user(
-        db, request.phone, request.email, request.password, request.auth_provider
+        db, request.phone, request.email, request.password, request.auth_provider, is_admin=request.is_admin
     )
     
     if not user_id:
@@ -87,6 +86,7 @@ def register(request: UserRegister, db: sqlite3.Connection = Depends(get_db)):
             (user_id, request.full_name)
         )
         db.commit()
+        cursor.close()
     # Send welcome notification
     notification_service.create_notification(
         db, user_id,

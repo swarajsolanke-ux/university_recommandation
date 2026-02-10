@@ -130,6 +130,126 @@
             border: 1px solid #e2e8f0;
             border-radius: 4px;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 24px;
+            color: #a0aec0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge.danger {
+            background: #fed7d7;
+            color: #822727;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .edit-btn {
+            background: #ebf8ff;
+            color: #2b6cb0;
+        }
+
+        .delete-btn {
+            background: #fff5f5;
+            color: #c53030;
+        }
+
+        .add-btn {
+            background: #3182ce;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            float: right;
+            margin-bottom: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -219,36 +339,205 @@
             </div>
         </div>
 
-        <!-- Other sections placeholders -->
+        <!-- University Management -->
         <div id="universities" class="section">
-            <h1>University Management</h1>
-            <p>Coming soon: Integrated CRUD for universities and majors.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h1>University Management</h1>
+                <button class="add-btn" onclick="openUniModal()">+ Add University</button>
+            </div>
+            <div class="admin-card">
+                <table id="uniTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Country</th>
+                            <th>Tuition</th>
+                            <th>Min GPA</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uniBody"></tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- Scholarship Management -->
         <div id="scholarships" class="section">
-            <h1>Scholarship Management</h1>
-            <p>Coming soon: Integrated CRUD for scholarship availability.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h1>Scholarship Management</h1>
+                <button class="add-btn" onclick="openSchModal()">+ Add Scholarship</button>
+            </div>
+            <div class="admin-card">
+                <table id="schTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Provider</th>
+                            <th>Amount</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- University Modal -->
+    <div id="uniModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="uniModalTitle">Add University</h2>
+                <span class="close-modal" onclick="closeModal('uniModal')">&times;</span>
+            </div>
+            <form id="uniForm">
+                <input type="hidden" id="uniId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>University Name</label>
+                        <input type="text" id="uniName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" id="uniCountry" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="uniCity">
+                    </div>
+                    <div class="form-group">
+                        <label>Tuition Fee ($)</label>
+                        <input type="number" id="uniTuition" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Min GPA</label>
+                        <input type="number" step="0.1" id="uniGpa" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <input type="text" id="uniLang" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ranking</label>
+                        <input type="number" id="uniRanking">
+                    </div>
+                    <div class="form-group">
+                        <label>Acceptance Rate (0.0 - 1.0)</label>
+                        <input type="number" step="0.01" id="uniAcceptance">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Website URL</label>
+                    <input type="url" id="uniWebsite">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="uniScholarship" style="width: auto;">
+                    <label style="margin-bottom: 0;">Scholarship Available</label>
+                </div>
+                <div class="form-group">
+                    <label>Overview</label>
+                    <textarea id="uniOverview" rows="3"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn" style="background: #e2e8f0;"
+                        onclick="closeModal('uniModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save University</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scholarship Modal -->
+    <div id="schModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="schModalTitle">Add Scholarship</h2>
+                <span class="close-modal" onclick="closeModal('schModal')">&times;</span>
+            </div>
+            <form id="schForm">
+                <input type="hidden" id="schId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Scholarship Name</label>
+                        <input type="text" id="schName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Provider</label>
+                        <input type="text" id="schProvider" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" id="schCountry" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="schAmount" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline (YYYY-MM-DD)</label>
+                        <input type="date" id="schDeadline" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Min GPA</label>
+                        <input type="number" step="0.1" id="schGpa" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Coverage (e.g., Full Tuition, Partial)</label>
+                    <input type="text" id="schCoverage" required>
+                </div>
+                <div class="form-group">
+                    <label>Website URL</label>
+                    <input type="url" id="schWebsite">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="schDescription" rows="3"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn" style="background: #e2e8f0;"
+                        onclick="closeModal('schModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Scholarship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
     <script>
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access_token');
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
+        if (!token) {
+            window.location.href = '/login';
+        }
 
-            // Load section data
-            if (id === 'overview') loadStats();
-            if (id === 'ai-settings') loadAISettings();
-            if (id === 'payments') loadPayments();
-            if (id === 'leads') loadLeads();
+        async function handleResponse(res) {
+            if (res.status === 401) {
+                alert('Session expired or unauthorized. Please login again.');
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+                return null;
+            }
+            if (!res.ok) {
+                try {
+                    const err = await res.json();
+                    alert(err.detail || 'An error occurred');
+                } catch (e) {
+                    alert('An unexpected error occurred');
+                }
+                return null;
+            }
+            return res.json();
         }
 
         async function loadStats() {
             const res = await fetch('/api/admin/system/stats', { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await res.json();
+            const data = await handleResponse(res);
+            if (!data) return;
+
             document.getElementById('statsRow').innerHTML = `
                 <div class="stat-box">
                     <span class="value">${data.total_applications}</span>
@@ -271,7 +560,9 @@
 
         async function loadAISettings() {
             const res = await fetch('/api/admin/system/ai-settings', { headers: { 'Authorization': `Bearer ${token}` } });
-            const s = await res.json();
+            const s = await handleResponse(res);
+            if (!s) return;
+
             document.getElementById('aiSettingsForm').innerHTML = `
                 <div class="form-group"><label>GPA Weight</label><input type="number" step="0.01" class="weight-input" id="w_gpa" value="${s.gpa_weight}"></div>
                 <div class="form-group"><label>Budget Weight</label><input type="number" step="0.01" class="weight-input" id="w_budget" value="${s.budget_weight}"></div>
@@ -290,13 +581,16 @@
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             });
-            if (res.ok) alert('Settings updated successfully!');
+            const data = await handleResponse(res);
+            if (data) alert('Settings updated successfully!');
         }
 
         async function loadPayments() {
             const res = await fetch('/api/admin/system/payments/report', { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await res.json();
-            document.getElementById('paymentsBody').innerHTML = data.reports.map(r => `
+            const data = await handleResponse(res);
+            if (!data) return;
+
+            document.getElementById('paymentsBody').innerHTML = (data.reports || []).map(r => `
                 <tr>
                     <td>${r.student_email}</td>
                     <td>${r.feature}</td>
@@ -309,8 +603,10 @@
 
         async function loadLeads() {
             const res = await fetch('/api/admin/system/leads', { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await res.json();
-            document.getElementById('leadsBody').innerHTML = data.leads.map(l => `
+            const data = await handleResponse(res);
+            if (!data) return;
+
+            document.getElementById('leadsBody').innerHTML = (data.leads || []).map(l => `
                 <tr>
                     <td>${l.name}</td>
                     <td>${l.offer}</td>
@@ -319,6 +615,205 @@
                     <td>${l.status}</td>
                 </tr>
             `).join('');
+        }
+
+        // --- University Management JS ---
+        async function loadUniversities() {
+            const res = await fetch('/api/admin/system/universities', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await handleResponse(res);
+            if (!data) return;
+
+            document.getElementById('uniBody').innerHTML = (data.universities || []).map(u => `
+                <tr>
+                    <td>${u.name}</td>
+                    <td>${u.country}</td>
+                    <td>$${u.tuition_fee}</td>
+                    <td>${u.min_gpa}</td>
+                    <td><span class="badge ${u.is_active ? 'success' : 'danger'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick='openUniModal(${JSON.stringify(u)})'>Edit</button>
+                        <button class="action-btn delete-btn" onclick="toggleUniStatus(${u.id})">${u.is_active ? 'Disable' : 'Enable'}</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openUniModal(u = null) {
+            document.getElementById('uniModal').style.display = 'flex';
+            document.getElementById('uniForm').reset();
+            if (u) {
+                document.getElementById('uniModalTitle').innerText = 'Edit University';
+                document.getElementById('uniId').value = u.id;
+                document.getElementById('uniName').value = u.name;
+                document.getElementById('uniCountry').value = u.country;
+                document.getElementById('uniCity').value = u.city || '';
+                document.getElementById('uniTuition').value = u.tuition_fee;
+                document.getElementById('uniGpa').value = u.min_gpa;
+                document.getElementById('uniLang').value = u.language;
+                document.getElementById('uniRanking').value = u.ranking || '';
+                document.getElementById('uniAcceptance').value = u.acceptance_rate || '';
+                document.getElementById('uniWebsite').value = u.website || '';
+                document.getElementById('uniScholarship').checked = !!u.scholarship_available;
+                document.getElementById('uniOverview').value = u.overview || '';
+            } else {
+                document.getElementById('uniId').value = '';
+                document.getElementById('uniModalTitle').innerText = 'Add University';
+            }
+        }
+
+        document.getElementById('uniForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('uniId').value;
+            const data = {
+                name: document.getElementById('uniName').value,
+                country: document.getElementById('uniCountry').value,
+                city: document.getElementById('uniCity').value,
+                tuition_fee: parseInt(document.getElementById('uniTuition').value),
+                min_gpa: parseFloat(document.getElementById('uniGpa').value),
+                language: document.getElementById('uniLang').value,
+                scholarship_available: document.getElementById('uniScholarship').checked,
+                overview: document.getElementById('uniOverview').value,
+                website: document.getElementById('uniWebsite').value,
+                ranking: parseInt(document.getElementById('uniRanking').value) || null,
+                acceptance_rate: parseFloat(document.getElementById('uniAcceptance').value) || null
+            };
+
+            const url = id ? `/api/admin/system/universities/${id}` : '/api/admin/system/universities';
+            const method = id ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await handleResponse(res);
+            if (result) {
+                closeModal('uniModal');
+                loadUniversities();
+                alert(id ? 'University updated!' : 'University added!');
+            }
+        };
+
+        async function toggleUniStatus(id) {
+            if (confirm('Toggle active status for this university?')) {
+                const res = await fetch(`/api/admin/system/universities/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await handleResponse(res);
+                if (result) loadUniversities();
+            }
+        }
+
+        // --- Scholarship Management JS ---
+        async function loadScholarships() {
+            const res = await fetch('/api/admin/system/scholarships', { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await handleResponse(res);
+            if (!data) return;
+
+            document.getElementById('schBody').innerHTML = (data.scholarships || []).map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.provider}</td>
+                    <td>$${s.amount}</td>
+                    <td>${s.deadline}</td>
+                    <td><span class="badge ${s.is_active ? 'success' : 'danger'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick='openSchModal(${JSON.stringify(s)})'>Edit</button>
+                        <button class="action-btn delete-btn" onclick="toggleSchStatus(${s.id})">${s.is_active ? 'Disable' : 'Enable'}</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openSchModal(s = null) {
+            document.getElementById('schModal').style.display = 'flex';
+            document.getElementById('schForm').reset();
+            if (s) {
+                document.getElementById('schModalTitle').innerText = 'Edit Scholarship';
+                document.getElementById('schId').value = s.id;
+                document.getElementById('schName').value = s.name;
+                document.getElementById('schProvider').value = s.provider;
+                document.getElementById('schCountry').value = s.country;
+                document.getElementById('schAmount').value = s.amount;
+                document.getElementById('schDeadline').value = s.deadline;
+                document.getElementById('schGpa').value = s.min_gpa;
+                document.getElementById('schCoverage').value = s.coverage;
+                document.getElementById('schWebsite').value = s.website || '';
+                document.getElementById('schDescription').value = s.description || '';
+            } else {
+                document.getElementById('schId').value = '';
+                document.getElementById('schModalTitle').innerText = 'Add Scholarship';
+            }
+        }
+
+        document.getElementById('schForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('schId').value;
+            const data = {
+                name: document.getElementById('schName').value,
+                provider: document.getElementById('schProvider').value,
+                country: document.getElementById('schCountry').value,
+                amount: parseInt(document.getElementById('schAmount').value),
+                deadline: document.getElementById('schDeadline').value,
+                min_gpa: parseFloat(document.getElementById('schGpa').value),
+                coverage: document.getElementById('schCoverage').value,
+                website: document.getElementById('schWebsite').value,
+                description: document.getElementById('schDescription').value
+            };
+
+            const url = id ? `/api/admin/system/scholarships/${id}` : '/api/admin/system/scholarships';
+            const method = id ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await handleResponse(res);
+            if (result) {
+                closeModal('schModal');
+                loadScholarships();
+                alert(id ? 'Scholarship updated!' : 'Scholarship added!');
+            }
+        };
+
+        async function toggleSchStatus(id) {
+            if (confirm('Toggle active status for this scholarship?')) {
+                const res = await fetch(`/api/admin/system/scholarships/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await handleResponse(res);
+                if (result) loadScholarships();
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const onclickStr = item.getAttribute('onclick');
+                if (onclickStr && onclickStr.includes(id)) {
+                    item.classList.add('active');
+                }
+            });
+
+            if (id === 'overview') loadStats();
+            if (id === 'ai-settings') loadAISettings();
+            if (id === 'payments') loadPayments();
+            if (id === 'leads') loadLeads();
+            if (id === 'universities') loadUniversities();
+            if (id === 'scholarships') loadScholarships();
         }
 
         loadStats();

@@ -3,7 +3,9 @@ from sqlite import get_db
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
 import logging
-
+import sqlite3
+from sqlite import get_db
+from fastapi import Depends
 from services.notification_service import NotificationService
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -13,10 +15,10 @@ class ApplicationService:
     
     
     @staticmethod
-    def create_application(user_id: int, university_id: int, major_id: int, notes: Optional[str] = None) -> Dict:
+    def create_application(user_id: int, university_id: int, major_id: int, notes: Optional[str],db:sqlite3.Connection) -> Dict:
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             # Check if application already exists
             cursor.execute("""
@@ -29,7 +31,7 @@ class ApplicationService:
             if existing:
                 app_id, status = existing
                 if status != 'Draft':
-                    conn.close()
+                    db.close()
                     return {
                         "error": f"Application already exists with status: {status}",
                         "application_id": app_id,
@@ -43,8 +45,8 @@ class ApplicationService:
             """, (user_id, university_id, major_id, notes))
             
             app_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
+            db.commit()
+            db.close()
             
             logger.info(f"Application {app_id} created for user {user_id}")
             print(f"application create with the id:{app_id}")
@@ -56,13 +58,14 @@ class ApplicationService:
             
         except Exception as e:
             logger.error(f"Error creating application: {e}")
-            return {"error": str(e)}
+            raise e
+            #return {"error": str(e)}
     
     @staticmethod
-    def get_application_details(application_id: int) -> Optional[Dict]:
+    def get_application_details(application_id: int,db:sqlite3.Connection) -> Optional[Dict]:
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             # Get application info
             cursor.execute("""
@@ -80,7 +83,7 @@ class ApplicationService:
             app = cursor.fetchone()
             print(f"Application details fetched: {app}")
             if not app:
-                conn.close()
+                db.close()
                 return None
             
             # Get uploaded documents
@@ -92,7 +95,7 @@ class ApplicationService:
             """, (application_id,))
             
             documents = cursor.fetchall()
-            conn.close()
+            db.close()
             print(f"documents detailes fetched:{documents}")
             return {
                 "id": app[0],
@@ -126,10 +129,10 @@ class ApplicationService:
             return None
     
     @staticmethod
-    def get_user_applications(user_id: int, status_filter: Optional[str] = None) -> List[Dict]:
+    def get_user_applications(user_id: int, status_filter: Optional[str],db:sqlite3.Connection) -> List[Dict]:
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             query = """
                 SELECT 
@@ -175,7 +178,7 @@ class ApplicationService:
                 })
             
         
-            conn.close()
+            db.close()
             print(f"Returning user applications: {len(result)} applications and their details:{result}")
             return result
             
@@ -184,23 +187,23 @@ class ApplicationService:
             return []
     
     @staticmethod
-    def submit_application(application_id: int) -> Dict:
+    def submit_application(application_id: int,db:sqlite3.Connection) -> Dict:
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             # Check current status
             cursor.execute("SELECT status FROM applications WHERE id = ?", (application_id,))
             result = cursor.fetchone()
             
             if not result:
-                conn.close()
+                db.close()
                 return {"error": "Application not found"}
             
             current_status = result[0]
             
             if current_status != 'Draft':
-                conn.close()
+                db.close()
                 return {"error": f"Cannot submit application with status: {current_status}"}
             
             # Check if required documents are uploaded (at least one document)
@@ -212,7 +215,7 @@ class ApplicationService:
             doc_count = cursor.fetchone()[0]
             
             if doc_count == 0:
-                conn.close()
+                db.close()
                 return {
                     "error": "Cannot submit application without documents",
                     "message": "Please upload at least one document before submitting"
@@ -232,7 +235,7 @@ class ApplicationService:
             # Create notification
            
             NotificationService.create_notification(
-                db=conn,
+                db=db,
                 user_id=user_id,
                 title="Application Submitted",
                 message=f"Your application has been successfully submitted and is now under review.",
@@ -261,8 +264,8 @@ class ApplicationService:
                 ]
             }
             
-            conn.commit()
-            conn.close()
+            db.commit()
+            db.close()
             
             logger.info(f"Application {application_id} submitted successfully")
             return response
@@ -283,7 +286,7 @@ class ApplicationService:
             return {"error": str(e)}
     
     @staticmethod
-    def update_application_status(application_id: int, new_status: str, admin_notes: Optional[str] = None) -> Dict:
+    def update_application_status(application_id: int, new_status: str, admin_notes: Optional[str] = None,db:sqlite3.Connection=None) -> Dict:
         """
         Update application status (Admin function)
         
@@ -302,15 +305,15 @@ class ApplicationService:
             return {"error": f"Invalid status: {new_status}"}
         
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             # Get user_id
             cursor.execute("SELECT user_id FROM applications WHERE id = ?", (application_id,))
             result = cursor.fetchone()
             
             if not result:
-                conn.close()
+                db.close()
                 return {"error": "Application not found"}
             
             user_id = result[0]
@@ -345,7 +348,7 @@ class ApplicationService:
                 notif_type = "success" if "Offer" in new_status else "warning" if new_status == "Missing Documents" else "info"
                 
                 NotificationService.create_notification(
-                    db=conn,
+                    db=db,
                     user_id=user_id,
                     title=title,
                     message=message,
@@ -353,8 +356,8 @@ class ApplicationService:
                     link=f"/applications/{application_id}"
                 )
             
-            conn.commit()
-            conn.close()
+            db.commit()
+            db.close()
             
             logger.info(f"Application {application_id} status updated to {new_status}")
             
@@ -369,7 +372,7 @@ class ApplicationService:
             return {"error": str(e)}
     
     @staticmethod
-    def delete_application(application_id: int, user_id: int) -> Dict:
+    def delete_application(application_id: int, user_id: int,db:sqlite3.Connection=None) -> Dict:
         """
         Delete a draft application
         
@@ -381,8 +384,8 @@ class ApplicationService:
             Dict with success status
         """
         try:
-            conn = get_db()
-            cursor = conn.cursor()
+            
+            cursor = db.cursor()
             
             # Check if application exists and belongs to user
             cursor.execute("""
@@ -393,20 +396,20 @@ class ApplicationService:
             result = cursor.fetchone()
             
             if not result:
-                conn.close()
+                db.close()
                 return {"error": "Application not found or unauthorized"}
             
             status = result[0]
             
             if status != 'Draft':
-                conn.close()
+                db.close()
                 return {"error": "Can only delete draft applications"}
             
             # Delete application (documents will be cascade deleted)
             cursor.execute("DELETE FROM applications WHERE id = ?", (application_id,))
             
-            conn.commit()
-            conn.close()
+            db.commit()
+            db.close()
             
             logger.info(f"Application {application_id} deleted")
             

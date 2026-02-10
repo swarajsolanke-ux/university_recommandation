@@ -237,7 +237,7 @@
 
             const response = await fetch('/api/payments/checkout', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
                 body: formData
             });
 

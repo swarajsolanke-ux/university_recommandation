@@ -1,3 +1,4 @@
+import sqlite3
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form
 from pydantic import BaseModel
 from typing import Optional, List
@@ -9,6 +10,7 @@ import os
 import shutil
 from datetime import datetime
 import logging
+from fastapi import Depends , status ,Security
 
 logging.basicConfig(level=logging.INFO)
 
@@ -34,13 +36,14 @@ class ApplicationStatusUpdate(BaseModel):
 # ============= Application Endpoints =============
 
 @router.post("/create")
-def create_application(request: ApplicationCreateRequest):
+def create_application(request: ApplicationCreateRequest,db:sqlite3.Connection=Depends(get_db)):
     """Create a new application in Draft status"""
     result = ApplicationService.create_application(
         user_id=request.user_id,
         university_id=request.university_id,
         major_id=request.major_id,
-        notes=request.notes
+        notes=request.notes,
+        db=db
     )
     
     if "error" in result:
@@ -50,9 +53,9 @@ def create_application(request: ApplicationCreateRequest):
 
 
 @router.get("/{application_id}")
-def get_application(application_id: int):
+def get_application(application_id: int,db:sqlite3.Connection=Depends(get_db)):
     """Get detailed information about an application"""
-    result = ApplicationService.get_application_details(application_id)
+    result = ApplicationService.get_application_details(application_id,db=db)
     
     if not result:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -61,12 +64,12 @@ def get_application(application_id: int):
 
 
 @router.get("/user/{user_id}")
-def get_user_applications(user_id: int, status: Optional[str] = None):
+def get_user_applications(user_id: int, status: Optional[str] = None,db:sqlite3.Connection=Depends(get_db)):
     """Get all applications for a user, optionally filtered by status"""
-    applications = ApplicationService.get_user_applications(user_id, status)
+    applications = ApplicationService.get_user_applications(user_id, status,db=db)
     
     # Get status counts
-    conn = get_db()
+    conn = db
     cursor = conn.cursor()
     cursor.execute("""
         SELECT status, COUNT(*) 
@@ -89,12 +92,13 @@ def get_user_applications(user_id: int, status: Optional[str] = None):
 async def upload_document(
     application_id: int,
     document_type: str = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    db:sqlite3.Connection=Depends(get_db)
 ):
     """Upload a document for an application"""
     
     # Validate application exists
-    app_details = ApplicationService.get_application_details(application_id)
+    app_details = ApplicationService.get_application_details(application_id,db=db)
     if not app_details:
         raise HTTPException(status_code=404, detail="Application not found")
     
@@ -118,7 +122,7 @@ async def upload_document(
             shutil.copyfileobj(file.file, buffer)
         
         # Save to database
-        conn = get_db()
+        conn = db
         cursor = conn.cursor()
         
         cursor.execute("""
@@ -149,9 +153,9 @@ async def upload_document(
 
 
 @router.post("/{application_id}/submit")
-def submit_application(application_id: int):
+def submit_application(application_id: int,db:sqlite3.Connection=Depends(get_db)):
     """Submit an application (change status from Draft to Submitted)"""
-    result = ApplicationService.submit_application(application_id)
+    result = ApplicationService.submit_application(application_id,db=db)
     
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
@@ -160,12 +164,13 @@ def submit_application(application_id: int):
 
 
 @router.patch("/{application_id}/status")
-def update_application_status(application_id: int, update: ApplicationStatusUpdate):
+def update_application_status(application_id: int, update: ApplicationStatusUpdate,db:sqlite3.Connection=Depends(get_db)):
     """Update application status (Admin only)"""
     result = ApplicationService.update_application_status(
         application_id=application_id,
         new_status=update.status,
-        admin_notes=update.admin_notes
+        admin_notes=update.admin_notes,
+        db=db
     )
     
     if "error" in result:
@@ -178,9 +183,9 @@ def update_application_status(application_id: int, update: ApplicationStatusUpda
 
 
 @router.delete("/{application_id}")
-def delete_application(application_id: int, user_id: int):
+def delete_application(application_id: int, user_id: int,db:sqlite3.Connection=Depends(get_db)):
     """Delete a draft application"""
-    result = ApplicationService.delete_application(application_id, user_id)
+    result = ApplicationService.delete_application(application_id, user_id,db=db)
     
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])

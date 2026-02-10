@@ -144,6 +144,8 @@ def verify_document(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
 @router.get("/stats")
 def get_dashboard_stats(current_admin: dict = Depends(require_admin), db: sqlite3.Connection = Depends(get_db)):
     """

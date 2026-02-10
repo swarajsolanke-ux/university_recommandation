@@ -32,7 +32,7 @@ class UserRegister(BaseModel):
     password: Optional[str] = Field(None, min_length=8)
     auth_provider: Optional[str] = 'email'  # email, phone, google, apple
     full_name: Optional[str] = None
-
+    is_admin:bool=False
 
 
 

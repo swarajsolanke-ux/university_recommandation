@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 logger.info("logger sucessfuly initializd in scholarship service")
 class ScholarshipService:
     @staticmethod
-    def get_all_scholarships(country: Optional[str] = None, min_amount: Optional[int] = None) -> List[Dict]:
+    def get_all_scholarships(country: Optional[str] = None, min_amount: Optional[int] = None,db:sqlite3.Connection=None) -> List[Dict]:
         """Fetch all active scholarships with optional filters"""
         try:
-            conn = get_db()
+            conn = db
             cursor = conn.cursor()
             
             query = "SELECT * FROM scholarships WHERE is_active = 1"
@@ -57,9 +57,9 @@ class ScholarshipService:
             return []
 
     @staticmethod
-    def get_scholarship_by_id(scholarship_id: int) -> Optional[Dict]:
+    def get_scholarship_by_id(scholarship_id: int,db:sqlite3.Connection) -> Optional[Dict]:
         try:
-            conn = get_db()
+            conn = db
             cursor = conn.cursor()
             
             cursor.execute("SELECT * FROM scholarships WHERE id = ?", (scholarship_id,))
@@ -92,9 +92,9 @@ class ScholarshipService:
             return None
 
     @staticmethod
-    def calculate_eligibility(user_id: int, scholarship_id: int) -> Dict:
+    def calculate_eligibility(user_id: int, scholarship_id: int,db:sqlite3.Connection) -> Dict:
         try:
-            conn = get_db()
+            conn = db
             cursor = conn.cursor()
             print("cursor created sucessfullly")
             # Get student profile
@@ -143,7 +143,7 @@ class ScholarshipService:
             return {"eligible": False, "reason": str(e)}
 
     @staticmethod
-    def create_scholarship_application(user_id: int, scholarship_id: int) -> Dict:
+    def create_scholarship_application(user_id: int, scholarship_id: int,db:sqlite3.Connection) -> Dict:
         """Create a new scholarship application draft"""
         try:
             conn = get_db()

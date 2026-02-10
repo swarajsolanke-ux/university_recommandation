@@ -210,14 +210,14 @@
         }
 
         async function startApplication(id) {
-            if (!localStorage.getItem('token')) {
+            if (!localStorage.getItem('access_token')) {
                 window.location.href = '/login';
                 return;
             }
 
             const response = await fetch(`/api/scholarships/${id}/apply`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
             });
 
             if (response.ok) {

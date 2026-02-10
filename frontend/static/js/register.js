@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         const terms = document.getElementById('terms').checked;
+        const isAdmin = document.getElementById('isAdmin').checked;
 
         if (!fullName || !email || !password || !confirmPassword) {
             showError('Please fill in all fields');
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         registrationData = {
             full_name: fullName,
             email: email,
-            password: password
+            password: password,
+            is_admin: isAdmin
         };
 
         goToStep(2);
@@ -71,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registrationData.preferred_country = document.getElementById('preferredCountry').value;
         registrationData.preferred_major = document.getElementById('preferredMajor').value;
         registrationData.learning_style = document.getElementById('learningStyle').value;
+    
 
         showLoading(document.getElementById('registerBtn'));
 
@@ -85,12 +88,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: registrationData.email,
                     password: registrationData.password,
                     full_name: registrationData.full_name,
-                    auth_provider: 'email'
+                    auth_provider: 'email',
+                    is_admin: registrationData.is_admin
                 })
             });
+            console.log("register response:",registerResponse.is_admin)
 
             const registerData = await registerResponse.json();
-
+            console.log("register data:",registerData);
             if (!registerResponse.ok) {
                 showError(registerData.detail || 'Registration failed');
                 hideLoading(document.getElementById('registerBtn'));

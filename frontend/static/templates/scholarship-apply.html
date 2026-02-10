@@ -120,7 +120,7 @@
         async function initPage() {
             try {
                 const response = await fetch('/api/scholarships/my-applications', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
                 });
                 const data = await response.json();
 
@@ -219,7 +219,7 @@
                 try {
                     const response = await fetch(`/api/scholarships/${currentApp.id}/upload`, {
                         method: 'POST',
-                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
                         body: formData
                     });
 
