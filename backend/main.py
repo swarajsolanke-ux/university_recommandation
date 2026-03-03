@@ -6,7 +6,7 @@ from routers import auth, chat, admin, application, university, assessment, univ
 import logging
 logging.basicConfig(level=logging.INFO)
 logger=logging.getLogger(__name__)
-import uvicorn # type: ignore
+import uvicorn # type: iore
 
 app = FastAPI(
     title="University Recommendation Platform",
