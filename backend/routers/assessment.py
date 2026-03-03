@@ -10,7 +10,7 @@ from datetime import datetime
 import logging
 from pydantic import BaseModel
 from typing import List 
-from test import VectorStore,user_profile_prompt
+from test import VectorStore
 
 from test4 import User_built_prompt, fetch_majors, question_genrate_prompt, recommend_majors
 from test_api import QuestionGenerateRequest

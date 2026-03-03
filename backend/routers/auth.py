@@ -8,6 +8,7 @@ from services import auth_service, otp_service, notification_service
 from sqlite import get_db
 from middleware.auth_middleware import get_current_active_user
 import sqlite3
+from logger import logger 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -71,6 +72,7 @@ def register(request: UserRegister, db: sqlite3.Connection = Depends(get_db)):
     user_id = auth_service.create_user(
         db, request.phone, request.email, request.password, request.auth_provider, is_admin=request.is_admin
     )
+
     
     if not user_id:
         raise HTTPException(
@@ -133,11 +135,11 @@ def get_current_user_info(
     # Get user info
     cursor = db.cursor()
     cursor.execute(
-        "SELECT id, email, phone, auth_provider, is_active, is_premium, created_at FROM users WHERE id = ?",
+        "SELECT id, email, phone, auth_provider, is_active, is_premium,created_at,is_admin FROM users WHERE id = ?",
         (user_id,)
     )
     user_row = cursor.fetchone()
-    
+    logger.info("user row fetched sucessfully:",user_row)
     if not user_row:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -148,7 +150,8 @@ def get_current_user_info(
         "auth_provider": user_row[3],
         "is_active": bool(user_row[4]),
         "is_premium": bool(user_row[5]),
-        "created_at": user_row[6]
+        "created_at": user_row[6],
+        "is_admin":bool(user_row[7])
     }
     
     # Get profile
@@ -177,7 +180,7 @@ def get_current_user_info(
             "bio": profile_row[11],
             "profile_image": profile_row[12]
         }
-    
+    logger.info("user data fetched sucessfully:",user_data)
     return {
         "user": user_data,
         "profile": profile_data

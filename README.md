@@ -54,7 +54,7 @@ A comprehensive AI-powered platform that guides students from major selection th
 
 ## 🛠️ Tech Stack
 
-### Backend
+### 
 - **FastAPI** - Modern Python web framework
 - **SQLite** - Lightweight database
 - **ChromaDB** - Vector database for AI embeddings
@@ -107,7 +107,7 @@ cp .env.example .env
 
 4. **Initialize the database:**
 ```bash
-cd backend
+cd 
 python database_enhanced.py
 ```
 
@@ -125,7 +125,7 @@ The application will be available at:
 
 ### First Time Setup
 
-1. Start the server: `python backend/main.py`
+1. Start the server: `python /main.py`
 2. Open http://localhost:8000 in your browser
 3. Click "Get Started" to register
 4. Complete your profile
@@ -177,7 +177,7 @@ POST /universities/recommend
 
 ```
 university_recommander/
-├── backend/
+├── /
 │   ├── models/           # Pydantic data models
 │   ├── routers/          # API endpoints
 │   ├── services/         # Business logic

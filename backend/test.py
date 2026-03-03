@@ -22,7 +22,7 @@ ollama_embed=OllamaEmbeddings(model="nomic-embed-text:latest")
 
 class VectorStore:
     def __init__(self):
-        persist_directory =os.path.join("/Users/swarajsolanke/Smart_assistant_chatbot/university_recommander/backend/chroma_db")
+        persist_directory =os.path.join("/Users/swarajsolanke/Smart_assistant_chatbot/university_recommander//chroma_db")
         self.vector_store = Chroma(
             embedding_function=ollama_embed,
             persist_directory=persist_directory
@@ -158,16 +158,16 @@ CAREER_TENDENCIES:
 
 
 
-llm=ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key=os.getenv("GROQ_API_KEY"),
-    temperature=0.0
-)
-
-# llm = ChatOllama(
-#     model="gemma2:2b",
-#     temperature=0
+# llm=ChatGroq(
+#     model="llama-3.1-8b-instant",
+#     api_key=os.getenv("GROQ_API_KEY"),
+#     temperature=0.0
 # )
+
+llm = ChatOllama(
+    model="gemma2:2b",
+    temperature=0
+)
 
 
 
@@ -216,7 +216,7 @@ class MajorProfile(BaseModel):
 
 
 llm_respose=llm.with_structured_output(schema=MajorProfile)
-print(llm_respose)
+# print(llm_respose)
 @retry(stop=stop_after_attempt(5) , wait=wait_fixed(5))
 def category_classifier(major: str) -> str:
     prompt=ChatPromptTemplate.from_template(
@@ -278,7 +278,7 @@ Q&A Session Data:
 
     chain = prompt|llm_respose
     result = chain.invoke (input={"qa": qa, "TAXONOMY_TEXT": TAXONOMY_TEXT})
-    print(result)
+    #print(result)
     return{
         "academic_strengths": result.academic_strengths,
         "thinking_style": result.thinking_style,
@@ -293,7 +293,7 @@ Q&A Session Data:
 
 
 
-result = user_profile_prompt("list_of_QA")
+# result = user_profile_prompt("list_of_QA")
 # print(result)
 
 

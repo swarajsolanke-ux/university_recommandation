@@ -1,12 +1,12 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI #type:ignore
+from fastapi.middleware.cors import CORSMiddleware #type:ignore
+from fastapi.staticfiles import StaticFiles #type:ignore
+from fastapi.responses import FileResponse, HTMLResponse #type:ignore
 from routers import auth, chat, admin, application, university, assessment, university_chatbot, admin_applications, scholarship, services, payment, admin_system
 import logging
 logging.basicConfig(level=logging.INFO)
 logger=logging.getLogger(__name__)
-import uvicorn
+import uvicorn # type: iore
 
 app = FastAPI(
     title="University Recommendation Platform",
