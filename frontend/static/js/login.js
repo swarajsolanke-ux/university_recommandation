@@ -24,7 +24,47 @@ document.addEventListener('DOMContentLoaded', () => {
             clearMessages();
         });
     });
+    
+ async function storeUserData() {
+        try {
+            const data = await authenticatedFetch('/auth/me');
+            if (data.ok) {
+                const user_data = await data.json();
+                localStorage.setItem('user', JSON.stringify(user_data.user));
+                console.log("data stored in localstorage");
 
+                return user_data.user;  
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
+        } catch (error) {
+            console.error("Unable to fetch user data:", error);
+            localStorage.removeItem('user');
+            return null;  
+        }
+    }
+
+  
+    async function toggleAdminLink() {
+        const user = await storeUserData();  
+        const adminLink = document.getElementById('adminPortalLink');
+        if (!adminLink) return;
+        if (user && user.is_admin ===1) {
+            adminLink.style.display = 'inline-flex';
+            adminLink.style.opacity = '1';
+        } else {
+            adminLink.style.display = 'none';
+        }
+    }
+
+    
+toggleAdminLink();  
+
+
+// Usage: Run after login or on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAdminLink();  
+});
     // Email login
     emailForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -44,11 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
+            console.log("data fetched",data);
+            
+
 
             if (response.ok) {
                 // Store token
                 localStorage.setItem('access_token', data.access_token);
                 localStorage.setItem('refresh_token', data.refresh_token);
+
+                await storeUserData();
+                console.log("user data sucessfully fetched:")
+                await toggleAdminLink();
+
 
                 showSuccess('Login successful! Redirecting...');
                 setTimeout(() => {

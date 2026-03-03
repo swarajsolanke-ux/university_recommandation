@@ -1,4 +1,4 @@
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse #type ignore
 from fastapi import HTTPException, Security, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
@@ -61,15 +61,11 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
         )
 
 def get_current_active_user(current_user: dict = Depends(get_current_user),db: sqlite3.Connection = Depends(get_db)):
-    """
-    Validates that the current user is active
-    """
-   
-    
     cursor = db.cursor()
     cursor.execute("SELECT is_active FROM users WHERE id = ?", (current_user["user_id"],))
     result = cursor.fetchone()
-    
+    print(f"active user fetched from db:{result}")
+    logger.info(f"active user fetched from db:{result}")
     if not result or not result[0]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -113,6 +109,7 @@ def require_admin(current_user: dict = Depends(get_current_active_user),db: sqli
     #         detail="Administrative access required"
     #     )
     if not is_admin_user(db, current_user["user_id"]):
+        logger.error("adminstrative access required")
         raise HTTPException(403, "Administrative access required")  
    
     print("current user id ",current_user) 

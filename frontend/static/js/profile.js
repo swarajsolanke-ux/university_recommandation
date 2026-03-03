@@ -12,9 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadProfileData() {
     try {
         const response = await authenticatedFetch('/auth/me');
+        console.log("response generated:",response)
 
         if (response.ok) {
             const data = await response.json();
+            console.log("current user data",data.user);
             populateProfile(data);
             await loadAssessmentHistory();
         }
@@ -23,6 +25,49 @@ async function loadProfileData() {
         showToast('Failed to load profile data', 'error');
     }
 }
+async function stored_data(){
+    try{
+        const data=await authenticatedFetch('/auth/me');
+        if (data.ok){
+            const user_data=await data.json();
+            localStorage.setItem('user',JSON.stringify(user_data.user));
+            showToast("sucessfully stored in localstorage");
+
+
+        }
+        else{
+            throw new Error('failed to fetch user data');
+        }
+    }
+    catch(error){
+        console.error("unable to fetch the user data")
+        showToast("failed to stored the user data");
+        localStorage.removeItem('user');
+    }
+}
+// const user=JSON.parse(localStorage.getItem('user'));
+// console.log("sucessfully get the data  ",user);
+// const isAdmin=user?.is_admin;
+
+
+function toggleAdminLink() {
+    const user = stored_data(); 
+    const adminLink = document.getElementById('adminPortalLink');
+    
+    if (user && user.is_admin === 1) {
+        // Show for admin
+        adminLink.style.display = 'inline-flex';  
+        adminLink.style.opacity = '1';
+    } else {
+        // Hide for normal users
+        adminLink.style.display = 'none';
+    }
+}
+
+// Usage: Run after login or on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAdminLink();  
+});
 
 function populateProfile(data) {
     const user = data.user;
@@ -132,7 +177,7 @@ async function savePersonalInfo() {
         bio: document.getElementById('bio').value,
         
     };
-    console.log('data to sent to backend',data)
+    console.log('data to sent to ',data)
 
     try {
         const response = await authenticatedFetch('/auth/profile/create', {

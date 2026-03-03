@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from config import settings
 from typing import Optional
 import sqlite3
+from logger import logger 
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -100,7 +101,32 @@ def create_user(db: sqlite3.Connection, phone: Optional[str], email: Optional[st
         # User already exists
         return None
     
+# def get_current_user(db:sqlite3.Connection,is_admin:int):
 
+#     try:
+
+#         cursor=db.cursor()
+#         cursor.execute(
+#             "SELECT is_admin from users where is_admin=?",(is_admin)
+#         )
+#         user=cursor.fetchone()
+#         logger.info("user sucessfully fetched",user)
+#         if user:
+#             return {
+#                 "id":user[0],
+#                 "email":user[1],
+#                 "phone":user[2],
+#                 "auth_provider":user[3],
+#                 "is_active":user[4],
+#                 "is_premium":user[5],
+#                 "is_admin":user[6]
+
+#             }
+#     except Exception as e:
+#             logger.error("Db connection failed",e)
+#             raise e
+    
+            
 def get_user_by_email(db: sqlite3.Connection, email: str):
     """Get user by email"""
     cursor = db.cursor()

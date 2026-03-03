@@ -1,0 +1,6 @@
+2026-02-23 16:33:53,907 - logger - INFO - sucessfully imported logger module
+2026-02-23 16:33:54,323 - root - WARNING - fallback mechanism is being called when there is no model available
+2026-02-23 16:33:54,323 - root - INFO - sucessfully executed the endpoints
+2026-02-23 16:33:55,513 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2026-02-23 16:33:55,632 - services.scholarship_service - INFO - logger sucessfuly initializd in scholarship service
+2026-02-23 16:33:55,668 - __main__ - INFO - sucessfully created the connection
