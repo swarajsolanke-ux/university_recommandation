@@ -18,3 +18,5 @@ passlib
 python-dotenv
 langchain-community
 langchain-ollama
+ipykernel
+pysqlite2
